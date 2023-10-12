@@ -115,7 +115,7 @@ public class FromSerialized {
 
         return switch (value) {
             //case TC_BLOCKDATA, TC_BLOCKDATALONG -> readBlockData(data);
-            case TC_OBJECT, TC_CLASS, TC_STRING, TC_LONGSTRING, TC_CLASSDESC, TC_REFERENCE, TC_NULL -> readObject(data);
+            case TC_OBJECT, TC_CLASS, TC_STRING, TC_LONGSTRING, TC_ENUM, TC_CLASSDESC, TC_REFERENCE, TC_NULL -> readObject(data);
             default -> throw new Exception("Invalid content magic byte:" + value);
         };
     }
@@ -126,10 +126,10 @@ public class FromSerialized {
 
         return switch (value) {
             case TC_OBJECT -> readNewObject(data);
-            //case TC_CLASS -> readNewClass(data);
+            case TC_CLASS -> readNewClass(data);
             //case TC_ARRAY -> readNewArray(data);
             case TC_STRING, TC_LONGSTRING -> new TypeGeneric<>(readNewString(data));
-            //case TC_ENUM -> readNewEnum(data);
+            case TC_ENUM -> readNewEnum(data);
             case TC_CLASSDESC -> readNewClassDesc(data);
             case TC_REFERENCE -> {
                 System.out.println("reference");
@@ -156,8 +156,16 @@ public class FromSerialized {
         throw new UnsupportedOperationException("Not yet implemented!");
     }
 
-    private void readNewEnum(ByteBuffer data) {
-        throw new UnsupportedOperationException("Not yet implemented!");
+    private TypeEnum readNewEnum(ByteBuffer data) throws Exception {
+        expectByte(data, TC_ENUM);
+
+        var classDesc = readClassDesc(data);
+        var handle = resources.newHandle();
+        var enumConstantName = readNewString(data);
+
+        var e = new TypeEnum(handle, classDesc, enumConstantName);
+        resources.registerResource(e.handle, e);
+        return e;
     }
 
     private void readNewArray(ByteBuffer data) {

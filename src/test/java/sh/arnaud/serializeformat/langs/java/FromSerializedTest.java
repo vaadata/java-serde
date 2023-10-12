@@ -28,11 +28,20 @@ class FromSerializedTest {
         public boolean z = true;
 
         public A example = null;
+        public Class ref_class = null;
 
     }
 
     private static class B extends A {
         public String childField = "<I'm B and I'm extending A>";
+    }
+    
+    private enum E {
+        One("One", 1, true),
+        Two("Two", 2, false);
+
+        E(String two, int i, boolean b) {
+        }
     }
 
     @Test
@@ -47,6 +56,7 @@ class FromSerializedTest {
         objectstream.writeObject(example);
 
         example2.example = example;
+        example2.ref_class = A.class;
         objectstream.writeObject(example2);
 
         var fromSerialized = new FromSerialized();
@@ -65,6 +75,25 @@ class FromSerializedTest {
         var bytestream = new ByteArrayOutputStream();
         var objectstream = new ObjectOutputStream(bytestream);
         objectstream.writeObject(example);
+
+        var fromSerialized = new FromSerialized();
+        var stream = fromSerialized.readStream(ByteBuffer.wrap(bytestream.toByteArray()));
+
+        System.out.println(stream);
+
+        Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().disableHtmlEscaping().excludeFieldsWithoutExposeAnnotation().create();
+        System.out.println(gson.toJson(stream));
+    }
+
+    @Test
+    void readStreamEnum() throws Exception {
+        var one = E.One;
+        var two = E.Two;
+
+        var bytestream = new ByteArrayOutputStream();
+        var objectstream = new ObjectOutputStream(bytestream);
+        objectstream.writeObject(one);
+        objectstream.writeObject(two);
 
         var fromSerialized = new FromSerialized();
         var stream = fromSerialized.readStream(ByteBuffer.wrap(bytestream.toByteArray()));
