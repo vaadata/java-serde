@@ -4,10 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.nio.ByteBuffer;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -60,12 +57,9 @@ class FromSerializedTest {
         objectstream.writeObject(example2);
 
         var fromSerialized = new FromSerialized();
-        var stream = fromSerialized.readStream(ByteBuffer.wrap(bytestream.toByteArray()));
+        var stream = fromSerialized.readStreamToJson(ByteBuffer.wrap(bytestream.toByteArray()));
 
         System.out.println(stream);
-
-        Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().disableHtmlEscaping().excludeFieldsWithoutExposeAnnotation().create();
-        System.out.println(gson.toJson(stream));
     }
 
     @Test
@@ -77,12 +71,9 @@ class FromSerializedTest {
         objectstream.writeObject(example);
 
         var fromSerialized = new FromSerialized();
-        var stream = fromSerialized.readStream(ByteBuffer.wrap(bytestream.toByteArray()));
+        var stream = fromSerialized.readStreamToJson(ByteBuffer.wrap(bytestream.toByteArray()));
 
         System.out.println(stream);
-
-        Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().disableHtmlEscaping().excludeFieldsWithoutExposeAnnotation().create();
-        System.out.println(gson.toJson(stream));
     }
 
     @Test
@@ -94,13 +85,41 @@ class FromSerializedTest {
         var objectstream = new ObjectOutputStream(bytestream);
         objectstream.writeObject(one);
         objectstream.writeObject(two);
+        objectstream.writeObject(two);
 
         var fromSerialized = new FromSerialized();
-        var stream = fromSerialized.readStream(ByteBuffer.wrap(bytestream.toByteArray()));
+        var stream = fromSerialized.readStreamToJson(ByteBuffer.wrap(bytestream.toByteArray()));
 
         System.out.println(stream);
+    }
 
-        Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().disableHtmlEscaping().excludeFieldsWithoutExposeAnnotation().create();
-        System.out.println(gson.toJson(stream));
+    @Test
+    void readStreamArray() throws Exception {
+        int[] one = { 0xde, 0xad, 0xbe, 0xef };
+        int[][] two = { { 0x1, 0x2 }, { 0x3, 0x4 } };
+
+        var bytestream = new ByteArrayOutputStream();
+        var objectstream = new ObjectOutputStream(bytestream);
+        objectstream.writeObject(one);
+        objectstream.writeObject(two);
+
+        var fromSerialized = new FromSerialized();
+        var stream = fromSerialized.readStreamToJson(ByteBuffer.wrap(bytestream.toByteArray()));
+
+        System.out.println(stream);
+    }
+
+    @Test
+    void readStreamWeird() throws Exception {
+        int[] one = { 0xde, 0xad, 0xbe, 0xef };
+        int[][] two = { { 0x1, 0x2 }, { 0x3, 0x4 } };
+
+        var file = new FileInputStream("/tmp/tmp.Y1BWIlJJOl/test2.txt");
+        var bytes = ByteBuffer.wrap(file.readAllBytes());
+
+        var fromSerialized = new FromSerialized();
+        var stream = fromSerialized.readStreamToJson(bytes);
+
+        System.out.println(stream);
     }
 }

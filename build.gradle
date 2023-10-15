@@ -20,3 +20,17 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+jar {
+    from {
+        configurations.runtimeClasspath.collect {
+            if (it.isDirectory()) {
+                return it
+            }
+
+            if (!it.name.startsWith("montoya-api")) {
+                return zipTree(it)
+            }
+        }
+    }
+}

@@ -14,7 +14,7 @@ public enum FieldTypeCode {
     Array((byte)'['),
     Object((byte)'L');
 
-    private final byte typecode;
+    public final byte typecode;
 
     FieldTypeCode(byte typecode) {
         this.typecode = typecode;

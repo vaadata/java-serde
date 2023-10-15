@@ -1,19 +1,20 @@
 package sh.arnaud.serializeformat.langs.java.grammar;
 
 import com.google.gson.annotations.Expose;
+import sh.arnaud.serializeformat.langs.java.HandleManager;
+import sh.arnaud.serializeformat.langs.java.grammar.classdesc.ClassDesc;
 
-public class TypeEnum extends TypeContent {
-    public final TypeClassDesc classDesc;
-
+public class TypeEnum extends Managed {
     @Expose
-    public final int handle;
+    public final ClassDesc classDesc;
 
     @Expose
     public final String enumConstantName;
 
-    public TypeEnum(int handle, TypeClassDesc classDesc, String enumConstantName) {
+    public TypeEnum(HandleManager manager, int handle, ClassDesc classDesc, String enumConstantName) {
+        super(manager, handle);
+
         this.classDesc = classDesc;
-        this.handle = handle;
         this.enumConstantName = enumConstantName;
     }
 }

@@ -4,33 +4,33 @@ import burp.api.montoya.MontoyaApi;
 import burp.api.montoya.core.ByteArray;
 import burp.api.montoya.http.message.HttpRequestResponse;
 import burp.api.montoya.http.message.requests.HttpRequest;
+import burp.api.montoya.http.message.responses.HttpResponse;
 import burp.api.montoya.ui.Selection;
 import burp.api.montoya.ui.editor.EditorOptions;
 import burp.api.montoya.ui.editor.RawEditor;
 import burp.api.montoya.ui.editor.extension.EditorCreationContext;
 import burp.api.montoya.ui.editor.extension.ExtensionProvidedHttpRequestEditor;
+import burp.api.montoya.ui.editor.extension.ExtensionProvidedHttpResponseEditor;
 import burp.api.montoya.utilities.CompressionType;
 import burp.api.montoya.utilities.CompressionUtils;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import sh.arnaud.serializeformat.langs.java.FromSerialized;
 
 import java.awt.*;
 import java.nio.ByteBuffer;
 
-public class RequestEditor implements ExtensionProvidedHttpRequestEditor {
+public class ResponseEditor implements ExtensionProvidedHttpResponseEditor {
     private final RawEditor editor;
     private final CompressionUtils compressionUtils;
     private HttpRequestResponse requestResponse;
 
-    public RequestEditor(MontoyaApi api, EditorCreationContext creationContext) {
+    public ResponseEditor(MontoyaApi api, EditorCreationContext creationContext) {
         editor = api.userInterface().createRawEditor(EditorOptions.READ_ONLY);
         compressionUtils = api.utilities().compressionUtils();
     }
 
     @Override
-    public HttpRequest getRequest() {
-        return requestResponse.request();
+    public HttpResponse getResponse() {
+        return requestResponse.response();
     }
 
     @Override
@@ -39,7 +39,7 @@ public class RequestEditor implements ExtensionProvidedHttpRequestEditor {
 
         var fromSerialized = new FromSerialized();
         try {
-            var body1 = requestResponse.request().body();
+            var body1 = requestResponse.response().body();
             var body2 = compressionUtils.decompress(body1, CompressionType.GZIP);
             var stream = fromSerialized.readStreamToJson(ByteBuffer.wrap(body2.getBytes()));
             editor.setContents(ByteArray.byteArray(stream));
@@ -50,7 +50,7 @@ public class RequestEditor implements ExtensionProvidedHttpRequestEditor {
 
     @Override
     public boolean isEnabledFor(HttpRequestResponse requestResponse) {
-        return requestResponse.request().hasHeader("Content-Type", "application/x-java-serialized-object");
+        return requestResponse.response().hasHeader("Content-Type", "application/x-java-serialized-object");
     }
 
     @Override

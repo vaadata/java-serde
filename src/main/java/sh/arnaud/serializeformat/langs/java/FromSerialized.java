@@ -1,10 +1,14 @@
 package sh.arnaud.serializeformat.langs.java;
 
+import com.google.gson.*;
 import sh.arnaud.serializeformat.langs.java.grammar.*;
+import sh.arnaud.serializeformat.langs.java.grammar.classdesc.ClassDesc;
+import sh.arnaud.serializeformat.langs.java.grammar.classdesc.ClassDescInfo;
+import sh.arnaud.serializeformat.langs.java.grammar.classdesc.TypeReferenceClassDesc;
+import sh.arnaud.serializeformat.langs.java.grammar.classdesc.TypecodeClassDesc;
 
 import java.nio.ByteBuffer;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.io.ObjectStreamConstants.*;
 
@@ -18,6 +22,7 @@ public class FromSerialized {
             throw new Exception("Unexpected byte received, expecting %d received %d".formatted(expected, value));
         }
     }
+
     private void expectShort(ByteBuffer data, short expected) throws Exception {
         short value = data.getShort();
 
@@ -34,88 +39,148 @@ public class FromSerialized {
         expectByte(data, TC_NULL);
     }
 
-    public TypeContent readPrevObject(ByteBuffer data) throws Exception {
+    public TypeReference readPrevObject(ByteBuffer data) throws Exception {
         expectByte(data, TC_REFERENCE);
 
         var handle = data.getInt();
-        var resource = resources.fetchResource(handle);
 
-        System.out.println("readPrevObject with handle " + handle);
-
-        if (resource == null) {
+        if (!resources.hasResource(handle)) {
             throw new Exception("No resource found for the given handle.");
         }
 
-        return resource;
+        return new TypeReference(handle);
     }
 
-    public TypeStream readStream(ByteBuffer data) throws Exception {
+    public String readStreamToJson(ByteBuffer data) throws Exception {
+        var stream = readStream(data);
+
+        // Pre dump
+
+        /*Gson gsonpre = new GsonBuilder().create();
+
+        SerializeFormat.api.logging().logToOutput("readStreamToJson");
+        try {
+            SerializeFormat.api.logging().logToOutput(gsonpre.toJson(stream));
+        } catch (Exception e) {
+            SerializeFormat.api.logging().logToOutput(e.getMessage());
+            SerializeFormat.api.logging().logToError(e);
+            return "error";
+        }*/
+
+        Gson gson = new GsonBuilder()
+                .serializeNulls()
+                .setPrettyPrinting()
+                .disableHtmlEscaping()
+                .excludeFieldsWithoutExposeAnnotation()
+                .registerTypeAdapter(TypeGeneric.class, (JsonSerializer<TypeGeneric>) (src, typeOfSrc, context) -> context.serialize(src.value))
+                .registerTypeAdapter(TypeReferenceClassDesc.class, (JsonSerializer<TypeReferenceClassDesc>) (src, typeOfSrc, context) -> {
+                    var object = new JsonObject();
+                    object.addProperty("@ref", src.handle);
+                    return object;
+                })
+                /*.registerTypeAdapter(TypeClass.class, (JsonSerializer<TypeClass>) (src, typeOfSrc, context) -> {
+                    if (!(src.classDesc instanceof TypeNormalClassDesc)) {
+                        throw new UnsupportedOperationException("Not supported yet.");
+                    }
+
+                    return context.serialize(((TypeNormalClassDesc)src.classDesc).className);
+                })
+                .registerTypeAdapter(TypeArray.class, (JsonSerializer<TypeArray>) (src, typeOfSrc, context) -> context.serialize(src.items))
+                *//*.registerTypeAdapter(TypeObject.class, (JsonSerializer<TypeObject>) (src, typeOfSrc, context) -> {
+                    var object = context.serialize(src.classdataflatten).getAsJsonObject();
+
+                    try {
+                        var normalClass = src.classDesc.getAsNormalClassDesc(resources);
+
+                        if (normalClass.className.equals("java.lang.StackTraceElement")) {
+                            if (object.get("methodName").isJsonObject()) {
+                                String formatted = "at %s(%s:%d)".formatted(
+                                        object.get("declaringClass").getAsString(),
+                                        object.get("fileName").getAsString(),
+                                        object.get("lineNumber").getAsInt()
+                                );
+
+                                return new JsonPrimitive(formatted);
+                            }
+
+
+                            String formatted = "at %s.%s(%s:%d)".formatted(
+                                    object.get("declaringClass").getAsString(),
+                                    object.get("methodName").getAsString(),
+                                    object.get("fileName").getAsString(),
+                                    object.get("lineNumber").getAsInt()
+                            );
+
+                            return new JsonPrimitive(formatted);
+                        }
+                    } catch (Exception ignored) {
+                        System.out.println("not a normal class desc");
+                    }
+
+                    object.addProperty(".class", src.classHandle);
+
+                    return object;
+                })*/
+                .create();
+
+        return gson.toJson(stream);
+    }
+
+    public List<TypeContent> readStream(ByteBuffer data) throws Exception {
         expectShort(data, STREAM_MAGIC);
         expectShort(data, STREAM_VERSION);
 
-        var list = new ArrayList<TypeContent>();
+        var contents = new ArrayList<TypeContent>();
 
         while (data.hasRemaining()) {
-            var content = readContent(data);
-            list.add(content);
-            System.out.println(content);
-            /*if (content instanceof TypeObject) {
-                var handle = ((TypeObject) content).classHandle;
-                var classDesc = resources.fetchResource(handle);
-
-                if (classDesc instanceof TypeNormalClassDesc) {
-                    classes.add((TypeNormalClassDesc) classDesc);
-                }
-            }*/
+            contents.add(readContent(data));
         }
 
-        var classes = resources.storage.values()
+        /*var classes = resources.storage.values()
                 .stream()
-                .filter(typeContent -> typeContent instanceof TypeNormalClassDesc)
-                .map(typeContent -> (TypeNormalClassDesc) typeContent)
+                .filter(typeContent -> typeContent instanceof TypecodeClassDesc)
+                .map(typeContent -> (TypecodeClassDesc) typeContent)
                 .collect(Collectors.toList());
 
-        var stream = new TypeStream(classes, list);
+        var stream = new TypeStream(classes, list);*/
 
-        return stream;
+        return contents;
     }
 
-    private void readBlockData(ByteBuffer data) throws Exception {
+    private TypeGeneric readBlockData(ByteBuffer data) throws Exception {
         byte value = peekByte(data);
 
-        switch (value) {
+        return switch (value) {
             case TC_BLOCKDATA -> readBlockDataShort(data);
             case TC_BLOCKDATALONG -> readBlockDataLong(data);
             default -> throw new Exception("Unexpected block data variant");
-        }
+        };
     }
 
-    private void readBlockDataLong(ByteBuffer data) throws Exception {
-        if (data.get() != TC_BLOCKDATALONG) {
-            throw new Exception("Invalid TC_BLOCKDATALONG");
-        }
+    private TypeGeneric readBlockDataLong(ByteBuffer data) throws Exception {
+        expectByte(data, TC_BLOCKDATALONG);
 
         int size = data.getInt();
         byte[] buffer = new byte[size];
         data.get(buffer);
+        return new TypeGeneric(buffer);
     }
 
-    private void readBlockDataShort(ByteBuffer data) throws Exception {
-        if (data.get() != TC_BLOCKDATA) {
-            throw new Exception("Invalid TC_BLOCKDATA");
-        }
+    private TypeGeneric readBlockDataShort(ByteBuffer data) throws Exception {
+        expectByte(data, TC_BLOCKDATA);
 
         int size = data.get() & 0xff;
         byte[] buffer = new byte[size];
         data.get(buffer);
+        return new TypeGeneric(buffer);
     }
 
     private TypeContent readContent(ByteBuffer data) throws Exception {
         byte value = peekByte(data);
 
         return switch (value) {
-            //case TC_BLOCKDATA, TC_BLOCKDATALONG -> readBlockData(data);
-            case TC_OBJECT, TC_CLASS, TC_STRING, TC_LONGSTRING, TC_ENUM, TC_CLASSDESC, TC_REFERENCE, TC_NULL -> readObject(data);
+            case TC_BLOCKDATA, TC_BLOCKDATALONG -> readBlockData(data);
+            case TC_OBJECT, TC_CLASS, TC_ARRAY, TC_STRING, TC_LONGSTRING, TC_ENUM, TC_CLASSDESC, TC_REFERENCE, TC_NULL -> readObject(data);
             default -> throw new Exception("Invalid content magic byte:" + value);
         };
     }
@@ -127,14 +192,11 @@ public class FromSerialized {
         return switch (value) {
             case TC_OBJECT -> readNewObject(data);
             case TC_CLASS -> readNewClass(data);
-            //case TC_ARRAY -> readNewArray(data);
-            case TC_STRING, TC_LONGSTRING -> new TypeGeneric<>(readNewString(data));
+            case TC_ARRAY -> readNewArray(data);
+            case TC_STRING, TC_LONGSTRING -> new TypeGeneric(readNewString(data));
             case TC_ENUM -> readNewEnum(data);
             case TC_CLASSDESC -> readNewClassDesc(data);
-            case TC_REFERENCE -> {
-                System.out.println("reference");
-                yield readPrevObject(data);
-            }
+            case TC_REFERENCE -> readPrevObject(data);
             case TC_NULL -> {
                 readNullReference(data);
                 yield null;
@@ -142,11 +204,13 @@ public class FromSerialized {
             //case TC_EXCEPTION -> readException(data);
             case TC_RESET -> {
                 // Consume the byte from the buffer.
-                data.get();
 
-                resources.reset();
+                throw new Exception("Reset are not handled yet!");
+                //data.get();
 
-                yield null;
+                //resources.reset();
+
+                //yield null;
             }
             default -> throw new Exception("Unexpected object variant: " + value);
         };
@@ -163,13 +227,43 @@ public class FromSerialized {
         var handle = resources.newHandle();
         var enumConstantName = readNewString(data);
 
-        var e = new TypeEnum(handle, classDesc, enumConstantName);
+        var e = new TypeEnum(resources, handle, classDesc, enumConstantName);
         resources.registerResource(e.handle, e);
         return e;
     }
 
-    private void readNewArray(ByteBuffer data) {
-        throw new UnsupportedOperationException("Not yet implemented!");
+    private TypeArray readNewArray(ByteBuffer data) throws Exception {
+        expectByte(data, TC_ARRAY);
+
+        var classDesc = readClassDesc(data);
+        var newHandle = resources.newHandle();
+
+        var classDescNormal = classDesc.getAsNormalClassDesc(resources);
+
+        // TODO: assert classDesc no super class
+        // TODO: assert className starts with [
+
+        var typeArray = new TypeArray(newHandle, classDesc, resources);
+
+        resources.registerResource(newHandle, typeArray);
+
+        var size = data.getInt();
+
+        List<Object> items = new ArrayList<>();
+
+        TypeFieldDesc fakeField = new TypeFieldDesc(
+                FieldTypeCode.fromByte((byte) classDescNormal.className.charAt(1)),
+                null,
+                null
+        );
+
+        for (var i = 0; i < size; i++) {
+            items.add(readValue(data, fakeField));
+        }
+
+        typeArray.items = items;
+
+        return typeArray;
     }
 
     private TypeObject readNewObject(ByteBuffer data) throws Exception {
@@ -178,23 +272,24 @@ public class FromSerialized {
         }
         
         var classDesc = readClassDesc(data);
-        var newHandle = resources.newHandle();
 
-        var typeobject = new TypeObject(newHandle, classDesc);
-
-        resources.registerResource(newHandle, typeobject);
+        var typeobject = new TypeObject(resources, classDesc);
 
         var cursor = classDesc;
 
         List<Map<String, Object>> list = new ArrayList<>();
-        List<TypeNormalClassDesc> chain = new ArrayList<>();
+        List<TypecodeClassDesc> chain = new ArrayList<>();
 
         while (cursor != null) {
-            if (cursor instanceof TypeNormalClassDesc) {
-                chain.add((TypeNormalClassDesc) cursor);
+            if (cursor instanceof TypecodeClassDesc) {
+                chain.add((TypecodeClassDesc) cursor);
             }
 
-            cursor = cursor.superClassDesc(resources);
+            if (cursor instanceof TypeReferenceClassDesc c) {
+                chain.add(c.getAsNormalClassDesc(resources));
+            }
+
+            cursor = cursor.superClassDesc();
         }
 
         Collections.reverse(chain);;
@@ -205,10 +300,27 @@ public class FromSerialized {
 
         typeobject.classdata = list;
 
+        if (!list.isEmpty()) {
+            typeobject.classdataflatten = new HashMap<>(list.get(list.size() - 1));
+            var last = typeobject.classdataflatten;
+
+            int consecutiveEmpty = 0;
+
+            while (consecutiveEmpty < list.size() && list.get(consecutiveEmpty).isEmpty()) {
+                consecutiveEmpty++;
+            }
+
+            for (int i = 1; i < list.size() - consecutiveEmpty; i++) {
+                var next = new HashMap<>(list.get(list.size() - 1 - i));
+                last.put(".super", next);
+                last = next;
+            }
+        }
+
         return typeobject;
     }
 
-    private Map<String, Object> readClassdata(ByteBuffer data, TypeNormalClassDesc currentClass) throws Exception {
+    private Map<String, Object> readClassdata(ByteBuffer data, TypecodeClassDesc currentClass) throws Exception {
         byte flag = currentClass.classDescInfo.classDescFlags;
 
         if ((SC_SERIALIZABLE & flag) == SC_SERIALIZABLE) {
@@ -238,60 +350,58 @@ public class FromSerialized {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    private void readObjectAnnotation(ByteBuffer data) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    private void readObjectAnnotation(ByteBuffer data) throws Exception {
+        while (peekByte(data) != TC_ENDBLOCKDATA) {
+            readContent(data);
+        }
+
+        // Remove the TC_ENDBLOCKDATA from the buffer.
+        data.get();
     }
 
-    private Map<String, Object> readValues(ByteBuffer data, TypeClassDesc currentClass) throws Exception {
+    private Map<String, Object> readValues(ByteBuffer data, ClassDesc currentClass) throws Exception {
         // Handling only the values for a TC_CLASSDESC, not handling TC_PROXYCLASSDESC yet.
-        if (!(currentClass instanceof TypeNormalClassDesc)) {
+        if (!(currentClass instanceof TypecodeClassDesc)) {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
         // TODO: Optimization, allocate the right number of items
         Map<String, Object> list = new HashMap<>();
 
-        for (var field : ((TypeNormalClassDesc)currentClass).classDescInfo.fields) {
+        for (var field : ((TypecodeClassDesc)currentClass).classDescInfo._fields) {
             var value = readValue(data, field);
 
-            if (value != null && TypeGeneric.class.isAssignableFrom(value.getClass())) {
-                list.put(field.fieldName, ((TypeGeneric<?>) value).value);
+            if (value instanceof TypeGeneric generic) {
+                list.put(field.fieldName, generic.value);
             } else {
                 list.put(field.fieldName, value);
             }
         }
+
         return list;
     }
 
     private TypeContent readValue(ByteBuffer data, TypeFieldDesc field) throws Exception {
         return switch (field.typecode) {
-            case Byte -> new TypeGeneric<>(data.get());
-            case Char -> new TypeGeneric<>(data.getChar());
-            case Double -> new TypeGeneric<>(data.getDouble());
-            case Float -> new TypeGeneric<>(data.getFloat());
-            case Integer -> new TypeGeneric<>(data.getInt());
-            case Long -> new TypeGeneric<>(data.getLong());
-            case Short -> new TypeGeneric<>(data.getShort());
-            case Boolean -> new TypeGeneric<>(data.get() != 0);
+            case Byte -> new TypeGeneric(data.get());
+            case Char -> new TypeGeneric(data.getChar());
+            case Double -> new TypeGeneric(data.getDouble());
+            case Float -> new TypeGeneric(data.getFloat());
+            case Integer -> new TypeGeneric(data.getInt());
+            case Long -> new TypeGeneric(data.getLong());
+            case Short -> new TypeGeneric(data.getShort());
+            case Boolean -> new TypeGeneric(data.get() != 0);
             case Object -> readObject(data);
-            default -> throw new UnsupportedOperationException("Not supported yet: " + field.typecode);
+            case Array -> readNewArray(data);
         };
     }
 
-    private TypeClassDesc readClassDesc(ByteBuffer data) throws Exception {
+    private ClassDesc readClassDesc(ByteBuffer data) throws Exception {
         byte value = data.get(data.position());
 
         return switch (value) {
             case TC_CLASSDESC -> readNewClassDesc(data);
-            case TC_REFERENCE -> {
-                var resource = readPrevObject(data);
-
-                if (!(resource instanceof TypeClassDesc)) {
-                    throw new Exception("Handle referenced wrong type of element");
-                }
-
-                yield (TypeClassDesc) resource;
-            }
+            case TC_REFERENCE -> new TypeReferenceClassDesc(resources, readPrevObject(data).reference);
             case TC_NULL -> {
                 readNullReference(data);
                 yield null;
@@ -304,16 +414,11 @@ public class FromSerialized {
         expectByte(data, TC_CLASS);
 
         var classDesc = readClassDesc(data);
-        var handle = resources.newHandle();
 
-        var typeClass = new TypeClass(handle, classDesc);
-
-        resources.registerResource(typeClass.handle, typeClass);
-
-        return typeClass;
+        return new TypeClass(resources, classDesc);
     }
 
-    private TypeClassDesc readNewClassDesc(ByteBuffer data) throws Exception {
+    private ClassDesc readNewClassDesc(ByteBuffer data) throws Exception {
         var value = peekByte(data);
 
         return switch (value) {
@@ -323,10 +428,8 @@ public class FromSerialized {
 
                 var className = readUtf(data);
                 var serialVersionUID = data.getLong();
-                var newHandle = resources.newHandle();
 
-                var classDesc = new TypeNormalClassDesc(newHandle, className, serialVersionUID);
-                resources.registerResource(classDesc.handle, classDesc);
+                var classDesc = new TypecodeClassDesc(resources, className, serialVersionUID);
 
                 classDesc.classDescInfo = readClassDescInfo(data);
 
@@ -339,13 +442,13 @@ public class FromSerialized {
         };
     }
 
-    private TypeClassDescInfo readClassDescInfo(ByteBuffer data) throws Exception {
+    private ClassDescInfo readClassDescInfo(ByteBuffer data) throws Exception {
         var classDescFlags = data.get();
         List<TypeFieldDesc> fields = readFields(data);
         readClassAnnotation(data);
         var superClassDesc = readClassDesc(data);
 
-        return new TypeClassDescInfo(classDescFlags, fields, superClassDesc);
+        return new ClassDescInfo(classDescFlags, fields, superClassDesc, resources);
     }
 
     private void readClassAnnotation(ByteBuffer data) throws Exception {
@@ -390,21 +493,19 @@ public class FromSerialized {
             case TC_STRING -> {
                 data.get();
                 var string = readUtf(data);
-                resources.registerResource(resources.newHandle(), new TypeGeneric<>(string));
+                resources.registerResource(resources.newHandle(), new TypeGeneric(string));
                 return string;
             }
             case TC_LONGSTRING -> {
                 data.get();
                 var string = readLongUtf(data);
-                resources.registerResource(resources.newHandle(), new TypeGeneric<>(string));
+                resources.registerResource(resources.newHandle(), new TypeGeneric(string));
                 return string;
             }
             case TC_REFERENCE -> {
-                var resource = readPrevObject(data);
+                var resource = resources.fetchResource(readPrevObject(data).reference);
 
-                if (TypeGeneric.class.isAssignableFrom(resource.getClass())) {
-                    var wrap = (TypeGeneric<?>) resource;
-
+                if (resource instanceof TypeGeneric wrap) {
                     if (wrap.value instanceof String) {
                         return (String) wrap.value;
                     }

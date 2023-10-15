@@ -4,7 +4,6 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class TypeFieldDesc {
-    @Expose
     public final FieldTypeCode typecode;
     @SerializedName("name")
     @Expose
@@ -16,6 +15,6 @@ public class TypeFieldDesc {
     public TypeFieldDesc(FieldTypeCode typecode, String fieldName, String className1) {
         this.typecode = typecode;
         this.fieldName = fieldName;
-        this.className1 = className1;
+        this.className1 = className1 != null ? className1 : String.format("%c", typecode.typecode);
     }
 }

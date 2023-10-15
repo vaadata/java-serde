@@ -1,15 +1,14 @@
 package sh.arnaud.serializeformat.langs.java.grammar;
 
 import com.google.gson.annotations.Expose;
+import sh.arnaud.serializeformat.langs.java.HandleManager;
+import sh.arnaud.serializeformat.langs.java.grammar.classdesc.ClassDesc;
 
-public class TypeClass extends TypeContent {
-    public final TypeClassDesc classDesc;
+public class TypeClass extends Managed {
+    public final ClassDesc classDesc;
 
-    @Expose
-    public final int handle;
-
-    public TypeClass(int handle, TypeClassDesc classDesc) {
+    public TypeClass(HandleManager manager, ClassDesc classDesc) {
+        super(manager);
         this.classDesc = classDesc;
-        this.handle = handle;
     }
 }

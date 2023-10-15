@@ -6,25 +6,22 @@ import sh.arnaud.serializeformat.langs.java.HandleManager;
 import sh.arnaud.serializeformat.langs.java.grammar.classdesc.ClassDesc;
 
 import java.util.List;
-import java.util.Map;
 
-public class TypeObject extends Managed {
+public class TypeArray extends TypeContent {
+    public final ClassDesc classDesc;
 
     @SerializedName("class")
     @Expose
     public final int classHandle;
-    @SerializedName("data")
+
+    public final int handle;
+
     @Expose
-    public List<Map<String, Object>> classdata = null;
+    public List<Object> items = null;
 
-    public Map<String, Object> classdataflatten = null;
-
-    // classdata
-    public final ClassDesc classDesc;
-
-    public TypeObject(HandleManager manager, ClassDesc classDesc) throws Exception {
-        super(manager);
+    public TypeArray(int handle, ClassDesc classDesc, HandleManager manager) throws Exception {
         this.classDesc = classDesc;
+        this.handle = handle;
         this.classHandle = classDesc.handle;
     }
 }

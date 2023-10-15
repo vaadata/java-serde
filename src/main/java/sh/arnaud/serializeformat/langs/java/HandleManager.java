@@ -12,7 +12,6 @@ public class HandleManager {
     private int currentHandle = ObjectStreamConstants.baseWireHandle;
 
     public int newHandle() {
-        System.out.println("Giving resource with handle: " + currentHandle);
         return currentHandle++;
     }
 
@@ -24,8 +23,12 @@ public class HandleManager {
         return storage.get(handle);
     }
 
-    public void reset() {
+    public boolean hasResource(int handle) {
+        return storage.containsKey(handle);
+    }
+
+    /*public void reset() {
         currentHandle = ObjectStreamConstants.baseWireHandle;
         storage.clear();
-    }
+    }*/
 }

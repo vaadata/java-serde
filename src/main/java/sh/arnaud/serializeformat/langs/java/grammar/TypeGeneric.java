@@ -1,9 +1,12 @@
 package sh.arnaud.serializeformat.langs.java.grammar;
 
-public class TypeGeneric<T> extends TypeContent {
-    public final T value;
+import com.google.gson.annotations.Expose;
 
-    public TypeGeneric(T value) {
+public class TypeGeneric extends TypeContent {
+    @Expose
+    public final Object value;
+
+    public TypeGeneric(Object value) {
         this.value = value;
     }
 }
