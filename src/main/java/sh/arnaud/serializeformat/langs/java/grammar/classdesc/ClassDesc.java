@@ -3,6 +3,8 @@ package sh.arnaud.serializeformat.langs.java.grammar.classdesc;
 import sh.arnaud.serializeformat.langs.java.HandleManager;
 import sh.arnaud.serializeformat.langs.java.grammar.Managed;
 
+import java.util.Optional;
+
 public abstract class ClassDesc extends Managed {
     public ClassDesc(HandleManager manager) {
         super(manager);
@@ -14,7 +16,7 @@ public abstract class ClassDesc extends Managed {
 
     public abstract ClassDesc superClassDesc() throws Exception;
 
-    public TypecodeClassDesc getAsNormalClassDesc(HandleManager manager) throws Exception {
-        throw new UnsupportedOperationException("The current classdesc can't be represented as a normal classdesc");
+    public Optional<TypecodeClassDesc> asTypecodeClassDesc() {
+        return Optional.empty();
     }
 }

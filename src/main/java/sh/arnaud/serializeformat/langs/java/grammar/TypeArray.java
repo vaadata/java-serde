@@ -7,21 +7,17 @@ import sh.arnaud.serializeformat.langs.java.grammar.classdesc.ClassDesc;
 
 import java.util.List;
 
-public class TypeArray extends TypeContent {
+public class TypeArray extends Managed {
+    @Expose
+    @SerializedName("@class")
     public final ClassDesc classDesc;
 
-    @SerializedName("class")
     @Expose
-    public final int classHandle;
-
-    public final int handle;
-
-    @Expose
+    @SerializedName("@items")
     public List<Object> items = null;
 
-    public TypeArray(int handle, ClassDesc classDesc, HandleManager manager) throws Exception {
+    public TypeArray(HandleManager manager, int handle, ClassDesc classDesc) throws Exception {
+        super(manager, handle);
         this.classDesc = classDesc;
-        this.handle = handle;
-        this.classHandle = classDesc.handle;
     }
 }

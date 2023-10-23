@@ -1,6 +1,7 @@
 package sh.arnaud.serializeformat.langs.java;
 
 import com.google.gson.*;
+import sh.arnaud.serializeformat.SerializeFormat;
 import sh.arnaud.serializeformat.langs.java.grammar.*;
 import sh.arnaud.serializeformat.langs.java.grammar.classdesc.ClassDesc;
 import sh.arnaud.serializeformat.langs.java.grammar.classdesc.ClassDescInfo;
@@ -72,10 +73,52 @@ public class FromSerialized {
                 .setPrettyPrinting()
                 .disableHtmlEscaping()
                 .excludeFieldsWithoutExposeAnnotation()
-                .registerTypeAdapter(TypeGeneric.class, (JsonSerializer<TypeGeneric>) (src, typeOfSrc, context) -> context.serialize(src.value))
+                /*.registerTypeAdapter(TypeGeneric.class, (JsonSerializer<TypeGeneric>) (src, typeOfSrc, context) -> context.serialize(src.value))*/
                 .registerTypeAdapter(TypeReferenceClassDesc.class, (JsonSerializer<TypeReferenceClassDesc>) (src, typeOfSrc, context) -> {
                     var object = new JsonObject();
                     object.addProperty("@ref", src.handle);
+                    return object;
+                })
+                .registerTypeAdapter(ClassData.class, (JsonSerializer<ClassData>) (src, typeOfSrc, context) -> {
+                    var object = context.serialize(src.values).getAsJsonObject();
+
+                    if (src.annotations != null) {
+                        object.add("@annotations", context.serialize(src.annotations));
+                    }
+
+                    return object;
+                })
+                .registerTypeAdapter(TypecodeClassDesc.class, (JsonSerializer<TypecodeClassDesc>) (src, typeOfSrc, context) -> {
+                    var fields = new JsonObject();
+
+                    for (var field : src.classDescInfo.fields) {
+                        fields.addProperty(field.fieldName, field.className1);
+                    }
+
+                    var object = new JsonObject();
+                    object.addProperty("@handle", src.handle);
+                    object.addProperty("@name", src.className);
+                    object.addProperty("@serial", src.serialVersionUID);
+                    object.addProperty("@flags", src.classDescInfo.classDescFlags);
+                    object.add("@fields", fields);
+                    object.add("@super", context.serialize(src.classDescInfo.superClassDesc));
+                    return object;
+                })
+                .registerTypeAdapter(TypeObject.class, (JsonSerializer<TypeObject>) (src, typeOfSrc, context) -> {
+                    Optional<JsonElement> classdata = src.classDesc.asTypecodeClassDesc().map((classDesc) -> {
+                        if (classDesc.className.equals("java.lang.Double")) {
+                            var value = src.classdata.get(1).values.get("value");
+                            return new JsonPrimitive((Double) value);
+                        }
+
+                        return null;
+                    });
+
+                    var object = new JsonObject();
+                    object.addProperty("@handle", src.handle);
+                    object.add("@class", context.serialize(src.classDesc));
+                    object.add("@data", classdata.orElseGet(() -> context.serialize(src.classdata)));
+
                     return object;
                 })
                 /*.registerTypeAdapter(TypeClass.class, (JsonSerializer<TypeClass>) (src, typeOfSrc, context) -> {
@@ -147,7 +190,7 @@ public class FromSerialized {
         return contents;
     }
 
-    private TypeGeneric readBlockData(ByteBuffer data) throws Exception {
+    private BlockData readBlockData(ByteBuffer data) throws Exception {
         byte value = peekByte(data);
 
         return switch (value) {
@@ -157,22 +200,22 @@ public class FromSerialized {
         };
     }
 
-    private TypeGeneric readBlockDataLong(ByteBuffer data) throws Exception {
+    private BlockData readBlockDataLong(ByteBuffer data) throws Exception {
         expectByte(data, TC_BLOCKDATALONG);
 
         int size = data.getInt();
         byte[] buffer = new byte[size];
         data.get(buffer);
-        return new TypeGeneric(buffer);
+        return new BlockData(buffer);
     }
 
-    private TypeGeneric readBlockDataShort(ByteBuffer data) throws Exception {
+    private BlockData readBlockDataShort(ByteBuffer data) throws Exception {
         expectByte(data, TC_BLOCKDATA);
 
         int size = data.get() & 0xff;
         byte[] buffer = new byte[size];
         data.get(buffer);
-        return new TypeGeneric(buffer);
+        return new BlockData(buffer);
     }
 
     private TypeContent readContent(ByteBuffer data) throws Exception {
@@ -238,12 +281,13 @@ public class FromSerialized {
         var classDesc = readClassDesc(data);
         var newHandle = resources.newHandle();
 
-        var classDescNormal = classDesc.getAsNormalClassDesc(resources);
+        // TODO: Assert it's a valid normal class
+        var classDescNormal = classDesc.asTypecodeClassDesc().get();
 
         // TODO: assert classDesc no super class
         // TODO: assert className starts with [
 
-        var typeArray = new TypeArray(newHandle, classDesc, resources);
+        var typeArray = new TypeArray(resources, newHandle, classDesc);
 
         resources.registerResource(newHandle, typeArray);
 
@@ -277,18 +321,11 @@ public class FromSerialized {
 
         var cursor = classDesc;
 
-        List<Map<String, Object>> list = new ArrayList<>();
+        List<ClassData> list = new ArrayList<>();
         List<TypecodeClassDesc> chain = new ArrayList<>();
 
         while (cursor != null) {
-            if (cursor instanceof TypecodeClassDesc) {
-                chain.add((TypecodeClassDesc) cursor);
-            }
-
-            if (cursor instanceof TypeReferenceClassDesc c) {
-                chain.add(c.getAsNormalClassDesc(resources));
-            }
-
+            cursor.asTypecodeClassDesc().ifPresent(chain::add);
             cursor = cursor.superClassDesc();
         }
 
@@ -300,39 +337,25 @@ public class FromSerialized {
 
         typeobject.classdata = list;
 
-        if (!list.isEmpty()) {
-            typeobject.classdataflatten = new HashMap<>(list.get(list.size() - 1));
-            var last = typeobject.classdataflatten;
-
-            int consecutiveEmpty = 0;
-
-            while (consecutiveEmpty < list.size() && list.get(consecutiveEmpty).isEmpty()) {
-                consecutiveEmpty++;
-            }
-
-            for (int i = 1; i < list.size() - consecutiveEmpty; i++) {
-                var next = new HashMap<>(list.get(list.size() - 1 - i));
-                last.put(".super", next);
-                last = next;
-            }
-        }
-
         return typeobject;
     }
 
-    private Map<String, Object> readClassdata(ByteBuffer data, TypecodeClassDesc currentClass) throws Exception {
+    private ClassData readClassdata(ByteBuffer data, TypecodeClassDesc currentClass) throws Exception {
         byte flag = currentClass.classDescInfo.classDescFlags;
 
         if ((SC_SERIALIZABLE & flag) == SC_SERIALIZABLE) {
+            SerializeFormat.log(currentClass.className);
             if ((SC_WRITE_METHOD & flag) == SC_WRITE_METHOD) {
+                SerializeFormat.log("wrclass");
                 // wrclass objectAnnotation
                 var values = readValues(data, currentClass);
-                readObjectAnnotation(data);
-                return values;
+                var annotations = readObjectAnnotation(data);
+                return new ClassData(values, annotations);
             } else {
+                SerializeFormat.log("nowrclass");
                 // nowrclass
                 var values = readValues(data, currentClass);
-                return values;
+                return new ClassData(values, null);
             }
         } else if ((SC_EXTERNALIZABLE & flag) == SC_EXTERNALIZABLE) {
             if ((SC_BLOCK_DATA & flag) == SC_BLOCK_DATA) {
@@ -343,20 +366,25 @@ public class FromSerialized {
                 readExternalContents(data);
             }
         }
-        return null;
+
+        throw new Exception("Invalid class flags");
     }
 
     private void readExternalContents(ByteBuffer data) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    private void readObjectAnnotation(ByteBuffer data) throws Exception {
+    private List<TypeContent> readObjectAnnotation(ByteBuffer data) throws Exception {
+        var contents = new ArrayList<TypeContent>();
+
         while (peekByte(data) != TC_ENDBLOCKDATA) {
-            readContent(data);
+            contents.add(readContent(data));
         }
 
         // Remove the TC_ENDBLOCKDATA from the buffer.
         data.get();
+
+        return contents;
     }
 
     private Map<String, Object> readValues(ByteBuffer data, ClassDesc currentClass) throws Exception {
@@ -368,7 +396,7 @@ public class FromSerialized {
         // TODO: Optimization, allocate the right number of items
         Map<String, Object> list = new HashMap<>();
 
-        for (var field : ((TypecodeClassDesc)currentClass).classDescInfo._fields) {
+        for (var field : ((TypecodeClassDesc)currentClass).classDescInfo.fields) {
             var value = readValue(data, field);
 
             if (value instanceof TypeGeneric generic) {
@@ -448,7 +476,7 @@ public class FromSerialized {
         readClassAnnotation(data);
         var superClassDesc = readClassDesc(data);
 
-        return new ClassDescInfo(classDescFlags, fields, superClassDesc, resources);
+        return new ClassDescInfo(classDescFlags, fields, superClassDesc);
     }
 
     private void readClassAnnotation(ByteBuffer data) throws Exception {

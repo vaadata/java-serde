@@ -2,6 +2,8 @@ package sh.arnaud.serializeformat.langs.java.grammar.classdesc;
 
 import sh.arnaud.serializeformat.langs.java.HandleManager;
 
+import java.util.Optional;
+
 public class TypeReferenceClassDesc extends ClassDesc {
     public TypeReferenceClassDesc(HandleManager manager, int handle) throws Exception {
         super(manager, handle);
@@ -12,18 +14,19 @@ public class TypeReferenceClassDesc extends ClassDesc {
     }
 
     public ClassDesc superClassDesc() throws Exception {
-        return getAsNormalClassDesc(manager).superClassDesc();
+        var resource = (ClassDesc) manager.fetchResource(handle);
+
+        return resource.superClassDesc();
     }
 
     @Override
-    public TypecodeClassDesc getAsNormalClassDesc(HandleManager manager) throws Exception {
+    public Optional<TypecodeClassDesc> asTypecodeClassDesc() {
         var resource = manager.fetchResource(handle);
 
         if (resource instanceof TypecodeClassDesc classDesc) {
-            return classDesc;
+            return Optional.of(classDesc);
         }
 
-        // TODO: Maybe move in constructor ?
-        throw new Exception("Not a reference to a TypeNormalClassDesc object");
+        return Optional.empty();
     }
 }

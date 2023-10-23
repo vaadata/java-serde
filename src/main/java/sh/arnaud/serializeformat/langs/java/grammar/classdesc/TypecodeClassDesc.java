@@ -4,6 +4,8 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import sh.arnaud.serializeformat.langs.java.HandleManager;
 
+import java.util.Optional;
+
 public class TypecodeClassDesc extends ClassDesc {
     @Expose
     public final String className;
@@ -26,7 +28,7 @@ public class TypecodeClassDesc extends ClassDesc {
     }
 
     @Override
-    public TypecodeClassDesc getAsNormalClassDesc(HandleManager manager) throws Exception {
-        return this;
+    public Optional<TypecodeClassDesc> asTypecodeClassDesc() {
+        return Optional.of(this);
     }
 }

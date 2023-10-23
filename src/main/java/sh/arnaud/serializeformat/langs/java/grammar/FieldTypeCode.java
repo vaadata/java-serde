@@ -23,7 +23,6 @@ public enum FieldTypeCode {
     public static FieldTypeCode fromByte(byte b) throws Exception {
         for (FieldTypeCode variant : FieldTypeCode.values()) {
             if (variant.typecode == b) {
-                System.out.println(b);
                 return variant;
             }
         }

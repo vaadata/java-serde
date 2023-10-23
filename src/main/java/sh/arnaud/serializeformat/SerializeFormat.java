@@ -17,4 +17,11 @@ public class SerializeFormat implements BurpExtension {
         api.userInterface().registerHttpRequestEditorProvider(provider);
         api.userInterface().registerHttpResponseEditorProvider(provider);
     }
+
+    // TODO: Remove
+    public static void log(String message) {
+        if (api != null) {
+            api.logging().logToOutput(message);
+        }
+    }
 }
