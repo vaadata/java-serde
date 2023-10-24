@@ -1,0 +1,48 @@
+[
+  {
+    "@class": {
+      "@handle": 8257536,
+      "@name": "Enum",
+      "@serial": 0,
+      "@flags": 18,
+      "@fields": [],
+      "@super": {
+        "@handle": 8257537,
+        "@name": "java.lang.Enum",
+        "@serial": 0,
+        "@flags": 18,
+        "@fields": [],
+        "@super": null
+      }
+    },
+    "@variant": "First",
+    "@handle": 8257538
+  },
+  {
+    "@class": {
+      "@ref": 8257536
+    },
+    "@variant": "Second",
+    "@handle": 8257540
+  },
+  {
+    "@ref": 8257540
+  },
+  {
+    "@class": {
+      "@ref": 8257536
+    },
+    "@variant": "Third",
+    "@handle": 8257542
+  },
+  {
+    "@class": {
+      "@ref": 8257536
+    },
+    "@variant": "Fourth",
+    "@handle": 8257544
+  },
+  {
+    "@ref": 8257542
+  }
+]

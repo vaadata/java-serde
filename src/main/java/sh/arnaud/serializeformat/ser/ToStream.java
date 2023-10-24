@@ -3,10 +3,7 @@ package sh.arnaud.serializeformat.ser;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.google.gson.JsonPrimitive;
-import sh.arnaud.serializeformat.grammar.ClassData;
-import sh.arnaud.serializeformat.grammar.TypeArray;
-import sh.arnaud.serializeformat.grammar.TypeContent;
-import sh.arnaud.serializeformat.grammar.TypeObject;
+import sh.arnaud.serializeformat.grammar.*;
 import sh.arnaud.serializeformat.grammar.classdesc.ClassDesc;
 import sh.arnaud.serializeformat.grammar.classdesc.TypeReferenceClassDesc;
 import sh.arnaud.serializeformat.grammar.classdesc.TypecodeClassDesc;
@@ -47,7 +44,20 @@ public class ToStream {
     private void writeContent(TypeContent content) throws Exception {
         if (content instanceof TypeObject object) {
             writeNewObject(object);
+        } else if (content instanceof TypeEnum newEnum) {
+
+            if (handleMapping.containsKey(newEnum.handle)) {
+                buffer.writeByte(TC_REFERENCE);
+                buffer.writeInt(handleMapping.get(newEnum.handle));
+                return;
+            }
+
+            buffer.writeByte(TC_ENUM);
+            writeClassDesc(newEnum.classDesc);
+            nextHandle(newEnum.handle);
+            writeNewString(newEnum.enumConstantName);
         } else {
+            System.out.println(content);
             throw new UnsupportedOperationException("Not yet implemented!");
         }
     }

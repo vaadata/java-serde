@@ -19,6 +19,7 @@ public class HandleManager {
     }
 
     public TypeContent fetchResource(int handle) {
+        // TODO: Error if nothing ?
         return storage.get(handle);
     }
 

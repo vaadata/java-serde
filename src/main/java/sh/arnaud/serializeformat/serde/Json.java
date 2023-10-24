@@ -142,6 +142,19 @@ public class Json {
 
             return object;
         })*/
+            .registerTypeAdapter(TypeEnum.class, (JsonDeserializer<TypeEnum>) (json1, typeOfT, context) -> {
+                var object = json1.getAsJsonObject();
+
+                var handle = object.get("@handle").getAsInt();
+                var variant = object.get("@variant").getAsString();
+                ClassDesc classDesc = context.deserialize(object.get("@class"), ClassDesc.class);
+
+                var typeEnum = new TypeEnum(resources, handle, classDesc, variant);
+
+                resources.registerResource(handle, typeEnum);
+
+                return typeEnum;
+            })
             .registerTypeAdapter(TypeReferenceClassDesc.class, (JsonDeserializer<TypeReferenceClassDesc>) (json1, typeOfT, context) -> {
                 try {
                     return new TypeReferenceClassDesc(resources, json1.getAsJsonObject().get("@ref").getAsInt());
@@ -153,12 +166,21 @@ public class Json {
                 if (json12.isJsonObject()) {
                     var object = json12.getAsJsonObject();
 
+                    if (object.has("@ref")) {
+                        var resource = resources.fetchResource(object.get("@ref").getAsInt());
+
+                        if (resource == null) {
+                            throw new JsonParseException("reference to nothing");
+                        }
+                        return resource;
+                    }
+
                     if (object.has("@handle") && object.has("@class") && object.has("@data")) {
                         return context.deserialize(json12, TypeObject.class);
                     }
 
-                    if (object.has("@ref")) {
-                        return resources.fetchResource(object.get("@ref").getAsInt());
+                    if (object.has("@handle") && object.has("@class") && object.has("@variant")) {
+                        return context.deserialize(json12, TypeEnum.class);
                     }
                 }
                 throw new JsonParseException("Couldn't parse TypeContent");
