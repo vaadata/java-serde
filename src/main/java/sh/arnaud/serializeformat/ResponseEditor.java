@@ -3,17 +3,16 @@ package sh.arnaud.serializeformat;
 import burp.api.montoya.MontoyaApi;
 import burp.api.montoya.core.ByteArray;
 import burp.api.montoya.http.message.HttpRequestResponse;
-import burp.api.montoya.http.message.requests.HttpRequest;
 import burp.api.montoya.http.message.responses.HttpResponse;
 import burp.api.montoya.ui.Selection;
 import burp.api.montoya.ui.editor.EditorOptions;
 import burp.api.montoya.ui.editor.RawEditor;
 import burp.api.montoya.ui.editor.extension.EditorCreationContext;
-import burp.api.montoya.ui.editor.extension.ExtensionProvidedHttpRequestEditor;
 import burp.api.montoya.ui.editor.extension.ExtensionProvidedHttpResponseEditor;
 import burp.api.montoya.utilities.CompressionType;
 import burp.api.montoya.utilities.CompressionUtils;
-import sh.arnaud.serializeformat.langs.java.FromSerialized;
+import sh.arnaud.serializeformat.de.Deserialize;
+import sh.arnaud.serializeformat.de.FromStream;
 
 import java.awt.*;
 import java.nio.ByteBuffer;
@@ -37,11 +36,10 @@ public class ResponseEditor implements ExtensionProvidedHttpResponseEditor {
     public void setRequestResponse(HttpRequestResponse requestResponse) {
         this.requestResponse = requestResponse;
 
-        var fromSerialized = new FromSerialized();
         try {
             var body1 = requestResponse.response().body();
             var body2 = compressionUtils.decompress(body1, CompressionType.GZIP);
-            var stream = fromSerialized.readStreamToJson(ByteBuffer.wrap(body2.getBytes()));
+            var stream = Deserialize.deserialize(body2.getBytes());
             editor.setContents(ByteArray.byteArray(stream));
         } catch (Exception e) {
             throw new RuntimeException(e);

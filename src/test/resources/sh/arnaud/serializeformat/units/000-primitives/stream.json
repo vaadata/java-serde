@@ -1,0 +1,66 @@
+[
+  {
+    "@handle": 8257537,
+    "@class": {
+      "@handle": 8257536,
+      "@name": "Primitives",
+      "@serial": 2373969731266750548,
+      "@flags": 2,
+      "@fields": [
+        {
+          "@name": "b",
+          "@type": "B"
+        },
+        {
+          "@name": "c",
+          "@type": "C"
+        },
+        {
+          "@name": "d",
+          "@type": "D"
+        },
+        {
+          "@name": "f",
+          "@type": "F"
+        },
+        {
+          "@name": "i",
+          "@type": "I"
+        },
+        {
+          "@name": "j",
+          "@type": "J"
+        },
+        {
+          "@name": "one",
+          "@type": "Z"
+        },
+        {
+          "@name": "s",
+          "@type": "S"
+        },
+        {
+          "@name": "zero",
+          "@type": "Z"
+        }
+      ],
+      "@super": null
+    },
+    "@data": [
+      {
+        "@values": [
+          42,
+          "!",
+          42.1337,
+          420.69,
+          2147483647,
+          81985529216486895,
+          true,
+          4919,
+          false
+        ],
+        "@annotations": []
+      }
+    ]
+  }
+]

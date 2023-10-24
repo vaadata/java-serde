@@ -11,9 +11,8 @@ import burp.api.montoya.ui.editor.extension.EditorCreationContext;
 import burp.api.montoya.ui.editor.extension.ExtensionProvidedHttpRequestEditor;
 import burp.api.montoya.utilities.CompressionType;
 import burp.api.montoya.utilities.CompressionUtils;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import sh.arnaud.serializeformat.langs.java.FromSerialized;
+import sh.arnaud.serializeformat.de.Deserialize;
+import sh.arnaud.serializeformat.de.FromStream;
 
 import java.awt.*;
 import java.nio.ByteBuffer;
@@ -37,11 +36,10 @@ public class RequestEditor implements ExtensionProvidedHttpRequestEditor {
     public void setRequestResponse(HttpRequestResponse requestResponse) {
         this.requestResponse = requestResponse;
 
-        var fromSerialized = new FromSerialized();
         try {
             var body1 = requestResponse.request().body();
             var body2 = compressionUtils.decompress(body1, CompressionType.GZIP);
-            var stream = fromSerialized.readStreamToJson(ByteBuffer.wrap(body2.getBytes()));
+            var stream = Deserialize.deserialize(body2.getBytes());
             editor.setContents(ByteArray.byteArray(stream));
         } catch (Exception e) {
             throw new RuntimeException(e);

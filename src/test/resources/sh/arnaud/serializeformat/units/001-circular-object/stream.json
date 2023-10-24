@@ -1,0 +1,47 @@
+[
+  {
+    "@handle": 8257538,
+    "@class": {
+      "@handle": 8257536,
+      "@name": "Circular",
+      "@serial": -6096131706402463234,
+      "@flags": 2,
+      "@fields": [
+        {
+          "@name": "circular",
+          "@type": "LCircular;"
+        },
+        {
+          "@name": "other",
+          "@type": "LCircular;"
+        }
+      ],
+      "@super": null
+    },
+    "@data": [
+      {
+        "@values": [
+          {
+            "@ref": 8257538
+          },
+          {
+            "@handle": 8257539,
+            "@class": {
+              "@ref": 8257536
+            },
+            "@data": [
+              {
+                "@values": [
+                  null,
+                  null
+                ],
+                "@annotations": []
+              }
+            ]
+          }
+        ],
+        "@annotations": []
+      }
+    ]
+  }
+]

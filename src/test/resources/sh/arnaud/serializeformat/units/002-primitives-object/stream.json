@@ -1,0 +1,304 @@
+[
+  {
+    "@handle": 8257545,
+    "@class": {
+      "@handle": 8257536,
+      "@name": "PrimitivesObject",
+      "@serial": 8749455767558950792,
+      "@flags": 2,
+      "@fields": [
+        {
+          "@name": "b",
+          "@type": "Ljava/lang/Byte;"
+        },
+        {
+          "@name": "c",
+          "@type": "Ljava/lang/Character;"
+        },
+        {
+          "@name": "d",
+          "@type": "Ljava/lang/Double;"
+        },
+        {
+          "@name": "f",
+          "@type": "Ljava/lang/Float;"
+        },
+        {
+          "@name": "i",
+          "@type": "Ljava/lang/Integer;"
+        },
+        {
+          "@name": "j",
+          "@type": "Ljava/lang/Long;"
+        },
+        {
+          "@name": "one",
+          "@type": "Ljava/lang/Boolean;"
+        },
+        {
+          "@name": "s",
+          "@type": "Ljava/lang/Short;"
+        },
+        {
+          "@name": "zero",
+          "@type": "Ljava/lang/Boolean;"
+        }
+      ],
+      "@super": null
+    },
+    "@data": [
+      {
+        "@values": [
+          {
+            "@handle": 8257548,
+            "@class": {
+              "@handle": 8257546,
+              "@name": "java.lang.Byte",
+              "@serial": -7183698231559129828,
+              "@flags": 2,
+              "@fields": [
+                {
+                  "@name": "value",
+                  "@type": "B"
+                }
+              ],
+              "@super": {
+                "@handle": 8257547,
+                "@name": "java.lang.Number",
+                "@serial": -8742448824652078965,
+                "@flags": 2,
+                "@fields": [],
+                "@super": null
+              }
+            },
+            "@data": [
+              {
+                "@values": [],
+                "@annotations": []
+              },
+              {
+                "@values": [
+                  42
+                ],
+                "@annotations": []
+              }
+            ]
+          },
+          {
+            "@handle": 8257550,
+            "@class": {
+              "@handle": 8257549,
+              "@name": "java.lang.Character",
+              "@serial": 3786198910865385080,
+              "@flags": 2,
+              "@fields": [
+                {
+                  "@name": "value",
+                  "@type": "C"
+                }
+              ],
+              "@super": null
+            },
+            "@data": [
+              {
+                "@values": [
+                  "!"
+                ],
+                "@annotations": []
+              }
+            ]
+          },
+          {
+            "@handle": 8257552,
+            "@class": {
+              "@handle": 8257551,
+              "@name": "java.lang.Double",
+              "@serial": -9172774392245257468,
+              "@flags": 2,
+              "@fields": [
+                {
+                  "@name": "value",
+                  "@type": "D"
+                }
+              ],
+              "@super": {
+                "@ref": 8257547
+              }
+            },
+            "@data": [
+              {
+                "@values": [],
+                "@annotations": []
+              },
+              {
+                "@values": [
+                  42.1337
+                ],
+                "@annotations": []
+              }
+            ]
+          },
+          {
+            "@handle": 8257554,
+            "@class": {
+              "@handle": 8257553,
+              "@name": "java.lang.Float",
+              "@serial": -2671257302660747028,
+              "@flags": 2,
+              "@fields": [
+                {
+                  "@name": "value",
+                  "@type": "F"
+                }
+              ],
+              "@super": {
+                "@ref": 8257547
+              }
+            },
+            "@data": [
+              {
+                "@values": [],
+                "@annotations": []
+              },
+              {
+                "@values": [
+                  420.69
+                ],
+                "@annotations": []
+              }
+            ]
+          },
+          {
+            "@handle": 8257556,
+            "@class": {
+              "@handle": 8257555,
+              "@name": "java.lang.Integer",
+              "@serial": 1360826667806852920,
+              "@flags": 2,
+              "@fields": [
+                {
+                  "@name": "value",
+                  "@type": "I"
+                }
+              ],
+              "@super": {
+                "@ref": 8257547
+              }
+            },
+            "@data": [
+              {
+                "@values": [],
+                "@annotations": []
+              },
+              {
+                "@values": [
+                  2147483647
+                ],
+                "@annotations": []
+              }
+            ]
+          },
+          {
+            "@handle": 8257558,
+            "@class": {
+              "@handle": 8257557,
+              "@name": "java.lang.Long",
+              "@serial": 4290774380558885855,
+              "@flags": 2,
+              "@fields": [
+                {
+                  "@name": "value",
+                  "@type": "J"
+                }
+              ],
+              "@super": {
+                "@ref": 8257547
+              }
+            },
+            "@data": [
+              {
+                "@values": [],
+                "@annotations": []
+              },
+              {
+                "@values": [
+                  81985529216486895
+                ],
+                "@annotations": []
+              }
+            ]
+          },
+          {
+            "@handle": 8257560,
+            "@class": {
+              "@handle": 8257559,
+              "@name": "java.lang.Boolean",
+              "@serial": -3665804199014368530,
+              "@flags": 2,
+              "@fields": [
+                {
+                  "@name": "value",
+                  "@type": "Z"
+                }
+              ],
+              "@super": null
+            },
+            "@data": [
+              {
+                "@values": [
+                  true
+                ],
+                "@annotations": []
+              }
+            ]
+          },
+          {
+            "@handle": 8257562,
+            "@class": {
+              "@handle": 8257561,
+              "@name": "java.lang.Short",
+              "@serial": 7515723908773894738,
+              "@flags": 2,
+              "@fields": [
+                {
+                  "@name": "value",
+                  "@type": "S"
+                }
+              ],
+              "@super": {
+                "@ref": 8257547
+              }
+            },
+            "@data": [
+              {
+                "@values": [],
+                "@annotations": []
+              },
+              {
+                "@values": [
+                  4919
+                ],
+                "@annotations": []
+              }
+            ]
+          },
+          {
+            "@handle": 8257563,
+            "@class": {
+              "@ref": 8257559
+            },
+            "@data": [
+              {
+                "@values": [
+                  false
+                ],
+                "@annotations": []
+              }
+            ]
+          }
+        ],
+        "@annotations": []
+      }
+    ]
+  }
+]
