@@ -1,0 +1,163 @@
+[
+  {
+    "@handle": 8257540,
+    "@class": {
+      "@handle": 8257536,
+      "@name": "ArrayNullElement",
+      "@serial": -6184240347588895404,
+      "@flags": 2,
+      "@fields": [
+        {
+          "@name": "classes",
+          "@type": "[Ljava/lang/Class;"
+        },
+        {
+          "@name": "integers",
+          "@type": "[Ljava/lang/Integer;"
+        },
+        {
+          "@name": "strings",
+          "@type": "[Ljava/lang/String;"
+        }
+      ],
+      "@super": null
+    },
+    "@data": [
+      {
+        "@values": [
+          {
+            "@class": {
+              "@handle": 8257541,
+              "@name": "[Ljava.lang.Class;",
+              "@serial": -6118465897992725863,
+              "@flags": 2,
+              "@fields": [],
+              "@super": null
+            },
+            "@items": [
+              {
+                "@class": {
+                  "@handle": 8257543,
+                  "@name": "java.lang.String",
+                  "@serial": -6849794470754667710,
+                  "@flags": 2,
+                  "@fields": [],
+                  "@super": null
+                },
+                "@handle": 8257544
+              },
+              {
+                "@class": {
+                  "@handle": 8257545,
+                  "@name": "java.lang.Integer",
+                  "@serial": 1360826667806852920,
+                  "@flags": 2,
+                  "@fields": [
+                    {
+                      "@name": "value",
+                      "@type": "I"
+                    }
+                  ],
+                  "@super": {
+                    "@handle": 8257546,
+                    "@name": "java.lang.Number",
+                    "@serial": -8742448824652078965,
+                    "@flags": 2,
+                    "@fields": [],
+                    "@super": null
+                  }
+                },
+                "@handle": 8257547
+              },
+              null,
+              {
+                "@ref": 8257544
+              }
+            ],
+            "@handle": 8257542
+          },
+          {
+            "@class": {
+              "@handle": 8257548,
+              "@name": "[Ljava.lang.Integer;",
+              "@serial": -101421563860753893,
+              "@flags": 2,
+              "@fields": [],
+              "@super": null
+            },
+            "@items": [
+              {
+                "@handle": 8257550,
+                "@class": {
+                  "@ref": 8257545
+                },
+                "@data": [
+                  {
+                    "@values": [],
+                    "@annotations": []
+                  },
+                  {
+                    "@values": [
+                      42
+                    ],
+                    "@annotations": []
+                  }
+                ]
+              },
+              null,
+              {
+                "@handle": 8257551,
+                "@class": {
+                  "@ref": 8257545
+                },
+                "@data": [
+                  {
+                    "@values": [],
+                    "@annotations": []
+                  },
+                  {
+                    "@values": [
+                      101
+                    ],
+                    "@annotations": []
+                  }
+                ]
+              },
+              {
+                "@ref": 8257550
+              }
+            ],
+            "@handle": 8257549
+          },
+          {
+            "@class": {
+              "@handle": 8257552,
+              "@name": "[Ljava.lang.String;",
+              "@serial": -5921575005990323385,
+              "@flags": 2,
+              "@fields": [],
+              "@super": null
+            },
+            "@items": [
+              {
+                "@value": "Hello, world"
+              },
+              {
+                "@value": "Lorem ipsum"
+              },
+              null,
+              {
+                "@value": "I'm secret!"
+              },
+              {
+                "@value": "Hello, world"
+              }
+            ],
+            "@handle": 8257553
+          }
+        ],
+        "@annotations": []
+      }
+    ]
+  }
+]

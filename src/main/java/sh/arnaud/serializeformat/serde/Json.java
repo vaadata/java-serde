@@ -3,6 +3,7 @@ package sh.arnaud.serializeformat.serde;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import sh.arnaud.serializeformat.HandleManager;
+import sh.arnaud.serializeformat.SerializeFormat;
 import sh.arnaud.serializeformat.grammar.*;
 import sh.arnaud.serializeformat.grammar.classdesc.ClassDesc;
 import sh.arnaud.serializeformat.grammar.classdesc.ClassDescInfo;
@@ -155,6 +156,18 @@ public class Json {
 
                 return typeEnum;
             })
+            .registerTypeAdapter(TypeClass.class, (JsonDeserializer<TypeClass>) (json1, typeOfT, context) -> {
+                var object = json1.getAsJsonObject();
+
+                ClassDesc classDesc = context.deserialize(object.get("@class"), ClassDesc.class);
+                var handle = object.get("@handle").getAsInt();
+
+                var typeClass = new TypeClass(resources, handle, classDesc);
+
+                resources.registerResource(handle, typeClass);
+
+                return typeClass;
+            })
             .registerTypeAdapter(TypeReferenceClassDesc.class, (JsonDeserializer<TypeReferenceClassDesc>) (json1, typeOfT, context) -> {
                 try {
                     return new TypeReferenceClassDesc(resources, json1.getAsJsonObject().get("@ref").getAsInt());
@@ -170,6 +183,7 @@ public class Json {
                         var resource = resources.fetchResource(object.get("@ref").getAsInt());
 
                         if (resource == null) {
+                            System.out.println(object.get("@ref").getAsInt());
                             throw new JsonParseException("reference to nothing");
                         }
                         return resource;
@@ -182,7 +196,28 @@ public class Json {
                     if (object.has("@handle") && object.has("@class") && object.has("@variant")) {
                         return context.deserialize(json12, TypeEnum.class);
                     }
+
+                    if (object.has("@class") && object.has("@handle")) {
+                        return context.deserialize(json12, TypeClass.class);
+                    }
+
+                    if (object.has("@value")) {
+                        var value = object.get("@value");
+
+                        if (value.isJsonPrimitive() && value.getAsJsonPrimitive().isString()) {
+                            var generic = new TypeGeneric(value.getAsString());
+
+                            if (!resources.hackyHasString(value.getAsString())) {
+                                resources.registerResource(resources.newHandle(), generic);
+                            }
+                            return generic;
+                        }
+
+                        return new TypeGeneric(value);
+                    }
                 }
+
+                SerializeFormat.log(json12.toString());
                 throw new JsonParseException("Couldn't parse TypeContent");
             })
             .registerTypeAdapter(TypecodeClassDesc.class, (JsonDeserializer<TypecodeClassDesc>) (json1, typeOfT, context) -> {
@@ -193,6 +228,8 @@ public class Json {
                 var newHandle = object.get("@handle").getAsInt();
                 var classDesc = new TypecodeClassDesc(resources, newHandle, className, serialVersionId);
 
+                System.out.println("Registering class");
+                System.out.println(newHandle);
                 resources.registerResource(newHandle, classDesc);
 
                 var flags = object.get("@flags").getAsByte();
@@ -237,6 +274,20 @@ public class Json {
                 }
 
                 return context.deserialize(json13, TypecodeClassDesc.class);
+            })
+            .registerTypeAdapter(TypeArray.class, (JsonDeserializer<TypeArray>) (json1, typeOfT, context) -> {
+                var object = json1.getAsJsonObject();
+                ClassDesc classDesc = context.deserialize(object.get("@class"), ClassDesc.class);
+
+                var newHandle = object.get("@handle").getAsInt();
+
+                var typeArray = new TypeArray(resources, newHandle, classDesc);
+
+                resources.registerResource(newHandle, typeArray);
+
+                typeArray.items = context.deserialize(object.get("@items").getAsJsonArray(), new TypeToken<List<TypeContent>>() {}.getType());
+
+                return typeArray;
             })
             .registerTypeAdapter(TypeObject.class, (JsonDeserializer<TypeObject>) (json1, typeOfT, context) -> {
                 var object = json1.getAsJsonObject();

@@ -52,7 +52,9 @@ class FromSerializedTest {
 
                         var back = Serialize.serialize(output);
 
+                        System.out.print("expected: ");
                         System.out.println(Arrays.toString(text.array()));
+                        System.out.print("  actual: ");
                         System.out.println(Arrays.toString(back.array()));
                         assertArrayEquals(text.array(), back.array());
                     });

@@ -14,4 +14,9 @@ public class TypeClass extends Managed {
         super(manager);
         this.classDesc = classDesc;
     }
+
+    public TypeClass(HandleManager manager, int handle, ClassDesc classDesc) {
+        super(manager, handle);
+        this.classDesc = classDesc;
+    }
 }

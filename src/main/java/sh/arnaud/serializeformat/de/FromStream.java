@@ -121,7 +121,21 @@ public class FromStream {
             case TC_STRING, TC_LONGSTRING -> new TypeGeneric(readNewString(data));
             case TC_ENUM -> readNewEnum(data);
             case TC_CLASSDESC -> readNewClassDesc(data);
-            case TC_REFERENCE -> readPrevObject(data);
+            case TC_REFERENCE -> {
+                // Strings are a weird case where we don't show them as reference because it's easier to see them in
+                // JSON.
+
+                var reference = readPrevObject(data);
+
+                yield resources.get(reference.reference)
+                        .map(resource -> {
+                            if (resource instanceof TypeGeneric generic && generic.value instanceof String) {
+                                return (TypeContent)generic;
+                            }
+                            return null;
+                        })
+                        .orElse(reference);
+            }
             case TC_NULL -> {
                 readNullReference(data);
                 yield null;
@@ -157,7 +171,21 @@ public class FromStream {
         return e;
     }
 
-    private TypeArray readNewArray(ByteBuffer data) throws Exception {
+    private TypeContent readNewArray(ByteBuffer data) throws Exception {
+        if (peekByte(data) == TC_REFERENCE) {
+            data.get();
+
+            var handle = data.getInt();
+
+            if (!resources.hasResource(handle)) {
+                throw new Exception("No resource found for the given handle.");
+            }
+
+            // TODO: Check if it's a reference to an array.
+
+            return new TypeReference(handle);
+        }
+
         expectByte(data, TC_ARRAY);
 
         var classDesc = readClassDesc(data);
@@ -175,7 +203,7 @@ public class FromStream {
 
         var size = data.getInt();
 
-        List<Object> items = new ArrayList<>();
+        List<TypeContent> items = new ArrayList<>();
 
         TypeFieldDesc fakeField = new TypeFieldDesc(
                 FieldTypeCode.fromByte((byte) classDescNormal.className.charAt(1)),

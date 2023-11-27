@@ -1,0 +1,69 @@
+[
+  {
+    "@handle": 8257538,
+    "@class": {
+      "@handle": 8257536,
+      "@name": "ArrayReference",
+      "@serial": 5695572939133213528,
+      "@flags": 2,
+      "@fields": [
+        {
+          "@name": "array",
+          "@type": "[B"
+        }
+      ],
+      "@super": null
+    },
+    "@data": [
+      {
+        "@values": [
+          {
+            "@class": {
+              "@handle": 8257539,
+              "@name": "[B",
+              "@serial": -5984413125824719648,
+              "@flags": 2,
+              "@fields": [],
+              "@super": null
+            },
+            "@items": [
+              {
+                "@value": 1
+              },
+              {
+                "@value": 2
+              },
+              {
+                "@value": 3
+              },
+              {
+                "@value": 4
+              },
+              {
+                "@value": 5
+              }
+            ],
+            "@handle": 8257540
+          }
+        ],
+        "@annotations": []
+      }
+    ]
+  },
+  {
+    "@handle": 8257541,
+    "@class": {
+      "@ref": 8257536
+    },
+    "@data": [
+      {
+        "@values": [
+          {
+            "@ref": 8257540
+          }
+        ],
+        "@annotations": []
+      }
+    ]
+  }
+]

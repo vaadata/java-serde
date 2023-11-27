@@ -14,9 +14,9 @@ public class TypeArray extends Managed {
 
     @Expose
     @SerializedName("@items")
-    public List<Object> items = null;
+    public List<TypeContent> items = null;
 
-    public TypeArray(HandleManager manager, int handle, ClassDesc classDesc) throws Exception {
+    public TypeArray(HandleManager manager, int handle, ClassDesc classDesc) {
         super(manager, handle);
         this.classDesc = classDesc;
     }

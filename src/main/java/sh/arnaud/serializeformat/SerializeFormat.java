@@ -22,6 +22,8 @@ public class SerializeFormat implements BurpExtension {
     public static void log(String message) {
         if (api != null) {
             api.logging().logToOutput(message);
+        } else {
+            System.out.println(message);
         }
     }
 }

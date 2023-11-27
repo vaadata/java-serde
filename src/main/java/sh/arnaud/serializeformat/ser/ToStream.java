@@ -27,6 +27,7 @@ public class ToStream {
     }
 
     private int getMapped(int handle) {
+        System.out.println(handleMapping);
         return handleMapping.get(handle);
     }
 
@@ -98,24 +99,60 @@ public class ToStream {
         }
     }
 
+    private void writeValue(Object value, TypeFieldDesc field) throws Exception {
+        if (value instanceof TypeGeneric) {
+            value = ((TypeGeneric) value).value;
+        }
+
+        switch (field.typecode) {
+            case Byte -> buffer.writeByte(((JsonPrimitive)value).getAsByte());
+            case Char -> buffer.writeChar(((JsonPrimitive)value).getAsString().charAt(0));
+            case Double -> buffer.writeDouble(((JsonPrimitive)value).getAsDouble());
+            case Float -> buffer.writeFloat(((JsonPrimitive)value).getAsFloat());
+            case Integer -> buffer.writeInt(((JsonPrimitive)value).getAsInt());
+            case Long -> buffer.writeLong(((JsonPrimitive)value).getAsLong());
+            case Short -> buffer.writeShort(((JsonPrimitive)value).getAsShort());
+            case Boolean -> buffer.writeBoolean(((JsonPrimitive)value).getAsBoolean());
+            case Array -> writeNewArray((TypeArray)value);
+            case Object -> {
+                if (value instanceof JsonPrimitive primitive && primitive.isString()) {
+                    writeNewString(primitive.getAsString());
+                } else if (value instanceof TypeClass clas) {
+                    writeNewClass(clas);
+                } else if (value instanceof String str) {
+                    writeNewString(str);
+                } else {
+                    writeNewObject((TypeObject) value);
+                }
+            }
+        }
+    }
+
+    private void writeNewClass(TypeClass clas) throws Exception {
+        /*if (object == null) {
+            buffer.writeByte(TC_NULL);
+            return;
+        }*/
+
+        // We already saw this object, make a reference instead.
+        if (handleMapping.containsKey(clas.handle)) {
+            buffer.writeByte(TC_REFERENCE);
+            buffer.writeInt(handleMapping.get(clas.handle));
+            return;
+        }
+
+        buffer.writeByte(TC_CLASS);
+        writeClassDesc(clas.classDesc);
+        nextHandle(clas.handle);
+    }
+
     private void writeClassdata(TypecodeClassDesc classDesc, ClassData classData) throws Exception {
         if (classDesc.classDescInfo.isNowrclass() || classDesc.classDescInfo.isWrclass()) {
             for (int index = 0; index < classDesc.classDescInfo.fields.size(); index++) {
                 var field = classDesc.classDescInfo.fields.get(index);
                 var value = classData.values.get(index);
 
-                switch (field.typecode) {
-                    case Byte -> buffer.writeByte(((JsonPrimitive)value).getAsByte());
-                    case Char -> buffer.writeChar(((JsonPrimitive)value).getAsString().charAt(0));
-                    case Double -> buffer.writeDouble(((JsonPrimitive)value).getAsDouble());
-                    case Float -> buffer.writeFloat(((JsonPrimitive)value).getAsFloat());
-                    case Integer -> buffer.writeInt(((JsonPrimitive)value).getAsInt());
-                    case Long -> buffer.writeLong(((JsonPrimitive)value).getAsLong());
-                    case Short -> buffer.writeShort(((JsonPrimitive)value).getAsShort());
-                    case Boolean -> buffer.writeBoolean(((JsonPrimitive)value).getAsBoolean());
-                    case Array -> writeNewArray((TypeArray)value);
-                    case Object -> writeNewObject((TypeObject)value);
-                }
+                writeValue(value, field);
             }
         } else {
             throw new UnsupportedOperationException("Not implemented yet!");
@@ -126,8 +163,29 @@ public class ToStream {
         }
     }
 
-    private void writeNewArray(TypeArray value) {
-        throw new UnsupportedOperationException("Not yet implemented!");
+    private void writeNewArray(TypeArray array) throws Exception {
+        if (handleMapping.containsKey(array.handle)) {
+            buffer.writeByte(TC_REFERENCE);
+            buffer.writeInt(getMapped(array.handle));
+            return;
+        }
+
+        buffer.writeByte(TC_ARRAY);
+
+        writeClassDesc(array.classDesc);
+        nextHandle(array.handle);
+        buffer.writeInt(array.items.size());
+
+        // TODO: Check validity of asTypecodeClassDesc
+        TypeFieldDesc fakeField = new TypeFieldDesc(
+                FieldTypeCode.fromByte((byte) array.classDesc.asTypecodeClassDesc().get().className.charAt(1)),
+                null,
+                null
+        );
+
+        for (var item : array.items) {
+            writeValue(item, fakeField);
+        }
     }
 
     private void writeClassDesc(ClassDesc classDesc) throws Exception {
@@ -135,6 +193,8 @@ public class ToStream {
             buffer.writeByte(TC_NULL);
         } else if (classDesc instanceof TypeReferenceClassDesc rcd) {
             buffer.writeByte(TC_REFERENCE);
+
+            System.out.println(rcd.handle);
             buffer.writeInt(getMapped(rcd.handle));
         } else {
             writeNewClassDesc(classDesc);
@@ -192,8 +252,8 @@ public class ToStream {
             buffer.write(TC_STRING);
             buffer.writeShort(string.length());
         }
-        buffer.write(string.getBytes());
 
+        buffer.write(string.getBytes());
         encounteredString.put(string, currentHandle++);
     }
 
