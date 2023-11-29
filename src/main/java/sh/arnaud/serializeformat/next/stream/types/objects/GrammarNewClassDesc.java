@@ -2,9 +2,6 @@ package sh.arnaud.serializeformat.next.stream.types.objects;
 
 import sh.arnaud.serializeformat.next.stream.types.FieldTypeCode;
 
-import static java.io.ObjectStreamConstants.SC_SERIALIZABLE;
-import static java.io.ObjectStreamConstants.SC_WRITE_METHOD;
-
 public class GrammarNewClassDesc extends GrammarObject {
     public final String className;
     public final long serialVersionUID;

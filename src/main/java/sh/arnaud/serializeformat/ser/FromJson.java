@@ -1,14 +1,9 @@
 package sh.arnaud.serializeformat.ser;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
-import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
 import sh.arnaud.serializeformat.next.stream.types.GrammarStream;
 import sh.arnaud.serializeformat.serde.Json;
 
 import java.io.ObjectStreamConstants;
-import java.nio.ByteBuffer;
 import java.util.*;
 
 @SuppressWarnings("UnstableApiUsage")

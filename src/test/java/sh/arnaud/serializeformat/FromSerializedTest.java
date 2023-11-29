@@ -3,14 +3,12 @@ package sh.arnaud.serializeformat;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import sh.arnaud.serializeformat.de.Deserialize;
-import sh.arnaud.serializeformat.ser.FromJson;
 import sh.arnaud.serializeformat.ser.Serialize;
 
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;

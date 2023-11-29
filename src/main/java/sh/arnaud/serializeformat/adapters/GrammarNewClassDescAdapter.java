@@ -9,8 +9,6 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
-import static sh.arnaud.serializeformat.serde.Json.makeRef;
-
 public class GrammarNewClassDescAdapter implements JsonSerializer<GrammarNewClassDesc>, JsonDeserializer<GrammarNewClassDesc> {
     private final SerializationContext serializationContext;
     private final DeserializationContext deserializationContext;
@@ -69,23 +67,19 @@ public class GrammarNewClassDescAdapter implements JsonSerializer<GrammarNewClas
 
     @Override
     public JsonElement serialize(GrammarNewClassDesc src, Type type, JsonSerializationContext context) {
-        if (serializationContext.seen.containsKey(src)) {
-            return makeRef(serializationContext.seen.get(src));
-        }
+        return serializationContext.referenceable(src, () -> {
+            var handle = serializationContext.register(src);
 
-        // TODO: Clean this
-        var handle = serializationContext.currentHandle++;
-        serializationContext.seen.put(src, handle);
+            var object = new JsonObject();
+            object.addProperty("@handle", handle);
+            object.addProperty("@name", src.className);
+            object.addProperty("@serial", src.serialVersionUID);
+            object.addProperty("@flags", src.classDescInfo.classDescFlags);
+            object.add("@fields", context.serialize(src.classDescInfo.fields));
+            object.add("@annotations", context.serialize(src.classDescInfo.annotations));
+            object.add("@super", context.serialize(src.classDescInfo.superClassDesc));
 
-        var object = new JsonObject();
-        object.addProperty("@handle", handle);
-        object.addProperty("@name", src.className);
-        object.addProperty("@serial", src.serialVersionUID);
-        object.addProperty("@flags", src.classDescInfo.classDescFlags);
-        object.add("@fields", context.serialize(src.classDescInfo.fields));
-        object.add("@annotations", context.serialize(src.classDescInfo.annotations));
-        object.add("@super", context.serialize(src.classDescInfo.superClassDesc));
-
-        return object;
+            return object;
+        });
     }
 }

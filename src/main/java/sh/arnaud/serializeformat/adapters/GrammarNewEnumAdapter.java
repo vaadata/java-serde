@@ -7,8 +7,6 @@ import sh.arnaud.serializeformat.next.stream.types.objects.GrammarNewString;
 
 import java.lang.reflect.Type;
 
-import static sh.arnaud.serializeformat.serde.Json.makeRef;
-
 public class GrammarNewEnumAdapter implements JsonSerializer<GrammarNewEnum>, JsonDeserializer<GrammarNewEnum> {
     private final SerializationContext serializationContext;
     private final DeserializationContext deserializationContext;
@@ -37,22 +35,17 @@ public class GrammarNewEnumAdapter implements JsonSerializer<GrammarNewEnum>, Js
 
     @Override
     public JsonElement serialize(GrammarNewEnum src, Type type, JsonSerializationContext context) {
-        if (serializationContext.seen.containsKey(src)) {
-            return makeRef(serializationContext.seen.get(src));
-        }
+        return serializationContext.referenceable(src, () -> {
+            // We need to serialize the class before to ensure correct order in the handle generation.
+            var classDesc = context.serialize(src.classDesc);
 
-        // We need to serialize the class before to ensure correct order in the handle generation.
-        var classDesc = context.serialize(src.classDesc);
+            var handle = serializationContext.register(src);
 
-        // TODO: Clean this
-        var handle = serializationContext.currentHandle++;
-        serializationContext.seen.put(src, handle);
-
-        var object = new JsonObject();
-        object.add("@class", classDesc);
-        object.add("@variant", context.serialize(src.enumConstantName));
-        object.addProperty("@handle", handle);
-
-        return object;
+            var object = new JsonObject();
+            object.add("@class", classDesc);
+            object.add("@variant", context.serialize(src.enumConstantName));
+            object.addProperty("@handle", handle);
+            return object;
+        });
     }
 }

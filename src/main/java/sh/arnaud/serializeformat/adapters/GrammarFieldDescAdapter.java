@@ -1,14 +1,10 @@
 package sh.arnaud.serializeformat.adapters;
 
 import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
 import sh.arnaud.serializeformat.next.stream.types.FieldTypeCode;
 import sh.arnaud.serializeformat.next.stream.types.objects.*;
 
 import java.lang.reflect.Type;
-import java.util.List;
-
-import static sh.arnaud.serializeformat.serde.Json.makeRef;
 
 public class GrammarFieldDescAdapter implements JsonSerializer<GrammarFieldDesc>, JsonDeserializer<GrammarFieldDesc> {
     private final SerializationContext serializationContext;

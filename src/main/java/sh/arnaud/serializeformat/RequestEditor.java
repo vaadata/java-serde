@@ -15,7 +15,6 @@ import sh.arnaud.serializeformat.de.Deserialize;
 import sh.arnaud.serializeformat.ser.Serialize;
 
 import java.awt.*;
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 public class RequestEditor implements ExtensionProvidedHttpRequestEditor {

@@ -2,7 +2,6 @@ package sh.arnaud.serializeformat.ser;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
-import com.google.gson.JsonPrimitive;
 import sh.arnaud.serializeformat.next.stream.types.FieldTypeCode;
 import sh.arnaud.serializeformat.next.stream.types.GrammarContent;
 import sh.arnaud.serializeformat.next.stream.types.GrammarStream;

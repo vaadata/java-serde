@@ -1,19 +1,11 @@
 package sh.arnaud.serializeformat.serde;
 
 import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
 import sh.arnaud.serializeformat.adapters.*;
-import sh.arnaud.serializeformat.next.stream.types.GrammarBlockdata;
-import sh.arnaud.serializeformat.next.stream.types.objects.GrammarNewArray;
-import sh.arnaud.serializeformat.next.stream.types.FieldTypeCode;
 import sh.arnaud.serializeformat.next.stream.types.GrammarContent;
 import sh.arnaud.serializeformat.next.stream.types.GrammarStream;
 import sh.arnaud.serializeformat.next.stream.types.objects.*;
 import sh.arnaud.serializeformat.next.stream.types.primitives.*;
-
-import java.io.ObjectStreamConstants;
-import java.lang.reflect.Type;
-import java.util.*;
 
 public class Json {
 

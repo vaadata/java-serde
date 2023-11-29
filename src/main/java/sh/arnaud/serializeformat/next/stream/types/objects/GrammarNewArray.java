@@ -1,6 +1,5 @@
 package sh.arnaud.serializeformat.next.stream.types.objects;
 
-import sh.arnaud.serializeformat.next.stream.types.objects.GrammarClassdata;
 import sh.arnaud.serializeformat.next.stream.types.objects.GrammarNewClassDesc;
 import sh.arnaud.serializeformat.next.stream.types.objects.GrammarObject;
 

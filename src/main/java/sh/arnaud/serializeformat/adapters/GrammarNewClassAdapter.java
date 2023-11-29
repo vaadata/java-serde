@@ -3,12 +3,8 @@ package sh.arnaud.serializeformat.adapters;
 import com.google.gson.*;
 import sh.arnaud.serializeformat.next.stream.types.objects.GrammarNewClass;
 import sh.arnaud.serializeformat.next.stream.types.objects.GrammarNewClassDesc;
-import sh.arnaud.serializeformat.next.stream.types.objects.GrammarNewEnum;
-import sh.arnaud.serializeformat.next.stream.types.objects.GrammarNewString;
 
 import java.lang.reflect.Type;
-
-import static sh.arnaud.serializeformat.serde.Json.makeRef;
 
 public class GrammarNewClassAdapter implements JsonSerializer<GrammarNewClass>, JsonDeserializer<GrammarNewClass> {
     private final SerializationContext serializationContext;
@@ -36,21 +32,16 @@ public class GrammarNewClassAdapter implements JsonSerializer<GrammarNewClass>, 
 
     @Override
     public JsonElement serialize(GrammarNewClass src, Type type, JsonSerializationContext context) {
-        if (serializationContext.seen.containsKey(src)) {
-            return makeRef(serializationContext.seen.get(src));
-        }
+        return serializationContext.referenceable(src, () -> {
+            // We need to serialize the class before to ensure correct order in the handle generation.
+            var classDesc = context.serialize(src.classDesc);
 
-        // We need to serialize the class before to ensure correct order in the handle generation.
-        var classDesc = context.serialize(src.classDesc);
+            var handle = serializationContext.register(src);
 
-        // TODO: Clean this
-        var handle = serializationContext.currentHandle++;
-        serializationContext.seen.put(src, handle);
-
-        var object = new JsonObject();
-        object.add("@class", classDesc);
-        object.addProperty("@handle", handle);
-
-        return object;
+            var object = new JsonObject();
+            object.add("@class", classDesc);
+            object.addProperty("@handle", handle);
+            return object;
+        });
     }
 }
