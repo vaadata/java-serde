@@ -18,15 +18,13 @@ public class GrammarNewEnumAdapter implements JsonSerializer<GrammarNewEnum>, Js
     @Override
     public GrammarNewEnum deserialize(JsonElement src, Type type, JsonDeserializationContext context) throws JsonParseException {
         var object = src.getAsJsonObject();
-        GrammarNewClassDesc classDesc = context.deserialize(object.get("@class"), GrammarNewClassDesc.class);
+
+        var newEnum = new GrammarNewEnum(
+                context.deserialize(object.get("@class"), GrammarNewClassDesc.class)
+        );
+
         var handle = object.get("@handle").getAsInt();
-
-        if (deserializationContext.seen.containsValue(handle)) {
-            throw new JsonParseException("Two different resource have the same handle");
-        }
-
-        var newEnum = new GrammarNewEnum(classDesc);
-        deserializationContext.seen.put(newEnum, handle);
+        deserializationContext.register(newEnum, handle);
 
         newEnum.enumConstantName = context.deserialize(object.get("@variant"), GrammarNewString.class);
 

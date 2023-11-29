@@ -24,15 +24,7 @@ public class GrammarObjectAdapter implements JsonDeserializer<GrammarObject> {
 
             if (object.has("@ref")) {
                 var handle = object.get("@ref").getAsInt();
-
-                return deserializationContext.seen.entrySet().stream()
-                        .filter(set -> set.getValue() == handle)
-                        .map(Map.Entry::getKey)
-                        .findFirst()
-                        .orElseThrow(() -> {
-                            System.out.println(handle);
-                            return new JsonParseException("Reference to a not yet declared object");
-                        });
+                return deserializationContext.find(handle);
             }
 
             if (object.has("@handle") && object.has("@class") && object.has("@data")) {

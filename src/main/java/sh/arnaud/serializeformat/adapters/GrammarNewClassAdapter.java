@@ -14,18 +14,17 @@ public class GrammarNewClassAdapter implements JsonSerializer<GrammarNewClass>, 
         this.serializationContext = serializationContext;
         this.deserializationContext = deserializationContext;
     }
+
     @Override
     public GrammarNewClass deserialize(JsonElement src, Type type, JsonDeserializationContext context) throws JsonParseException {
         var object = src.getAsJsonObject();
-        GrammarNewClassDesc classDesc = context.deserialize(object.get("@class"), GrammarNewClassDesc.class);
+
+        var newClass = new GrammarNewClass(
+            context.deserialize(object.get("@class"), GrammarNewClassDesc.class)
+        );
+
         var handle = object.get("@handle").getAsInt();
-
-        if (deserializationContext.seen.containsValue(handle)) {
-            throw new JsonParseException("Two different resource have the same handle");
-        }
-
-        var newClass = new GrammarNewClass(classDesc);
-        deserializationContext.seen.put(newClass, handle);
+        deserializationContext.register(newClass, handle);
 
         return newClass;
     }

@@ -18,15 +18,13 @@ public class GrammarNewArrayAdapter implements JsonSerializer<GrammarNewArray>, 
     @Override
     public GrammarNewArray deserialize(JsonElement src, Type type, JsonDeserializationContext context) throws JsonParseException {
         var object = src.getAsJsonObject();
-        GrammarNewClassDesc classDesc = context.deserialize(object.get("@class"), GrammarNewClassDesc.class);
+
+        var newArray = new GrammarNewArray(
+                context.deserialize(object.get("@class"), GrammarNewClassDesc.class)
+        );
+
         var handle = object.get("@handle").getAsInt();
-
-        if (deserializationContext.seen.containsValue(handle)) {
-            throw new JsonParseException("Two different resource have the same handle");
-        }
-
-        var newArray = new GrammarNewArray(classDesc);
-        deserializationContext.seen.put(newArray, handle);
+        deserializationContext.register(newArray, handle);
 
         newArray.values = context.deserialize(object.get("@items"), new TypeToken<List<GrammarObject>>() {}.getType());
 
