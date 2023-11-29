@@ -3,8 +3,8 @@
     "@handle": 8257538,
     "@class": {
       "@handle": 8257536,
-      "@name": "ArrayNullElement$A",
-      "@serial": -3018275438310061744,
+      "@name": "ClassesWithSameFieldName$A",
+      "@serial": 1007921726327277420,
       "@flags": 2,
       "@fields": [
         {
@@ -28,8 +28,8 @@
     "@handle": 8257541,
     "@class": {
       "@handle": 8257540,
-      "@name": "ArrayNullElement$B",
-      "@serial": -324213145540467233,
+      "@name": "ClassesWithSameFieldName$B",
+      "@serial": -5854814728253191916,
       "@flags": 2,
       "@fields": [
         {

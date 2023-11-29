@@ -1,4 +1,4 @@
-package sh.arnaud.serializeformat;
+package sh.arnaud.serializeformat.burp;
 
 import burp.api.montoya.BurpExtension;
 import burp.api.montoya.MontoyaApi;

@@ -7,13 +7,6 @@ import sh.arnaud.serializeformat.next.stream.types.objects.*;
 import java.lang.reflect.Type;
 
 public class GrammarFieldDescAdapter implements JsonSerializer<GrammarFieldDesc>, JsonDeserializer<GrammarFieldDesc> {
-    private final SerializationContext serializationContext;
-    private final DeserializationContext deserializationContext;
-
-    public GrammarFieldDescAdapter(SerializationContext serializationContext, DeserializationContext deserializationContext) {
-        this.serializationContext = serializationContext;
-        this.deserializationContext = deserializationContext;
-    }
     @Override
     public GrammarFieldDesc deserialize(JsonElement src, Type _type, JsonDeserializationContext context) throws JsonParseException {
         var object = src.getAsJsonObject();

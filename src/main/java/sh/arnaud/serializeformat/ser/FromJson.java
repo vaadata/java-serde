@@ -14,7 +14,7 @@ public class FromJson {
 
 
 
-    public GrammarStream writeStreamFromJson(String s) throws Exception {
+    public GrammarStream writeStreamFromJson(String s) {
         /*writeStream(JsonParser.parseString(json));
 
         return ByteBuffer.wrap(buffer.toByteArray());*/

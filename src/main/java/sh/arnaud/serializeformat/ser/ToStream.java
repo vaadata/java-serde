@@ -3,6 +3,7 @@ package sh.arnaud.serializeformat.ser;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import sh.arnaud.serializeformat.next.stream.types.FieldTypeCode;
+import sh.arnaud.serializeformat.next.stream.types.GrammarBlockdata;
 import sh.arnaud.serializeformat.next.stream.types.GrammarContent;
 import sh.arnaud.serializeformat.next.stream.types.GrammarStream;
 import sh.arnaud.serializeformat.next.stream.types.objects.*;
@@ -57,6 +58,11 @@ public class ToStream {
 
         if (content instanceof GrammarNewClass newClass) {
             writeNewClass(newClass);
+            return;
+        }
+
+        if (content instanceof GrammarBlockdata blockdata) {
+            writeBlockdata(blockdata);
             return;
         }
 
@@ -243,6 +249,18 @@ public class ToStream {
         buffer.write(string.string.getBytes());
     }
 
+    private void writeBlockdata(GrammarBlockdata blockdata) {
+        if (blockdata.blockdata.length > 0xff) {
+            buffer.writeByte(TC_BLOCKDATALONG);
+            buffer.writeInt(blockdata.blockdata.length);
+        } else {
+            buffer.writeByte(TC_BLOCKDATA);
+            buffer.writeByte(blockdata.blockdata.length);
+        }
+
+        buffer.write(blockdata.blockdata);
+    }
+
     private void writeValue(GrammarObject value, GrammarFieldDesc field) throws Exception {
         switch (field.typeCode) {
             case Array -> writeNewArray((GrammarNewArray) value);
@@ -308,7 +326,10 @@ public class ToStream {
         }
 
         if (classDesc.classDescInfo.isWrclass()) {
-            throw new UnsupportedOperationException("Not yet implemented!");
+            for (var annotation : classData.annotations) {
+                writeContent(annotation);
+            }
+            buffer.writeByte(TC_ENDBLOCKDATA);
         }
     }
 //

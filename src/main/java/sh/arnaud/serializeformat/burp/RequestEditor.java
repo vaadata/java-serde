@@ -1,4 +1,4 @@
-package sh.arnaud.serializeformat;
+package sh.arnaud.serializeformat.burp;
 
 import burp.api.montoya.MontoyaApi;
 import burp.api.montoya.core.ByteArray;
@@ -56,6 +56,8 @@ public class RequestEditor implements ExtensionProvidedHttpRequestEditor {
 
     @Override
     public boolean isEnabledFor(HttpRequestResponse requestResponse) {
+        SerializeFormat.log(requestResponse.request().toString());
+        SerializeFormat.log(requestResponse.request().headers().toString());
         return requestResponse.request().hasHeader("Content-Type", "application/x-java-serialized-object");
     }
 

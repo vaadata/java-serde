@@ -8,7 +8,6 @@ import sh.arnaud.serializeformat.next.stream.types.objects.*;
 import sh.arnaud.serializeformat.next.stream.types.primitives.PrimitiveJson;
 
 import java.lang.reflect.Type;
-import java.util.Map;
 
 public class GrammarObjectAdapter implements JsonDeserializer<GrammarObject> {
     private final DeserializationContext deserializationContext;

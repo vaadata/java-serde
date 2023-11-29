@@ -1,0 +1,109 @@
+[
+  {
+    "@handle": 8257538,
+    "@class": {
+      "@handle": 8257536,
+      "@name": "ObjectWithAnnotation",
+      "@serial": 9081771203543481543,
+      "@flags": 2,
+      "@fields": [
+        {
+          "@name": "one",
+          "@type": "Ljava/util/Date;"
+        },
+        {
+          "@name": "three",
+          "@type": "Ljava/util/Date;"
+        },
+        {
+          "@name": "two",
+          "@type": "Ljava/util/Date;"
+        }
+      ],
+      "@annotations": [],
+      "@super": null
+    },
+    "@data": [
+      {
+        "@values": [
+          {
+            "@handle": 8257540,
+            "@class": {
+              "@handle": 8257539,
+              "@name": "java.util.Date",
+              "@serial": 7523967970034938905,
+              "@flags": 3,
+              "@fields": [],
+              "@annotations": [],
+              "@super": null
+            },
+            "@data": [
+              {
+                "@values": [],
+                "@annotations": [
+                  [
+                    0,
+                    0,
+                    0,
+                    0,
+                    101,
+                    103,
+                    81,
+                    61
+                  ]
+                ]
+              }
+            ]
+          },
+          {
+            "@handle": 8257541,
+            "@class": {
+              "@ref": 8257539
+            },
+            "@data": [
+              {
+                "@values": [],
+                "@annotations": [
+                  [
+                    0,
+                    0,
+                    0,
+                    0,
+                    101,
+                    103,
+                    81,
+                    61
+                  ]
+                ]
+              }
+            ]
+          },
+          {
+            "@handle": 8257542,
+            "@class": {
+              "@ref": 8257539
+            },
+            "@data": [
+              {
+                "@values": [],
+                "@annotations": [
+                  [
+                    0,
+                    0,
+                    0,
+                    0,
+                    65,
+                    -92,
+                    11,
+                    61
+                  ]
+                ]
+              }
+            ]
+          }
+        ],
+        "@annotations": []
+      }
+    ]
+  }
+]

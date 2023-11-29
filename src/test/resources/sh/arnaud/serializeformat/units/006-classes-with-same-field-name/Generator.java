@@ -1,6 +1,6 @@
 import java.io.*;
 
-public class ArrayNullElement implements Serializable {
+public class ClassesWithSameFieldName implements Serializable {
 	public static class A implements Serializable {
 		public final String one = "My string";
 	}
@@ -12,8 +12,8 @@ public class ArrayNullElement implements Serializable {
 
 	public static void main(String args[]) throws Exception {
 		var stream = new ObjectOutputStream(System.out);
-		stream.writeObject(new ArrayNullElement.A());
-		stream.writeObject(new ArrayNullElement.B());
+		stream.writeObject(new ClassesWithSameFieldName.A());
+		stream.writeObject(new ClassesWithSameFieldName.B());
 		stream.flush();
 	}
 }

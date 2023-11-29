@@ -2,6 +2,7 @@ package sh.arnaud.serializeformat.serde;
 
 import com.google.gson.*;
 import sh.arnaud.serializeformat.adapters.*;
+import sh.arnaud.serializeformat.next.stream.types.GrammarBlockdata;
 import sh.arnaud.serializeformat.next.stream.types.GrammarContent;
 import sh.arnaud.serializeformat.next.stream.types.GrammarStream;
 import sh.arnaud.serializeformat.next.stream.types.objects.*;
@@ -20,22 +21,15 @@ public class Json {
 
             .registerTypeAdapter(GrammarStream.class, new GrammarStreamAdapter())
             .registerTypeAdapter(GrammarContent.class, new GrammarContentAdapter())
-
             .registerTypeAdapter(GrammarObject.class, new GrammarObjectAdapter(deserializationContext))
-
             .registerTypeAdapter(GrammarNewObject.class, new GrammarNewObjectAdapter(serializationContext, deserializationContext))
-
             .registerTypeAdapter(GrammarNewEnum.class, new GrammarNewEnumAdapter(serializationContext, deserializationContext))
-
             .registerTypeAdapter(GrammarNewClass.class, new GrammarNewClassAdapter(serializationContext, deserializationContext))
-
             .registerTypeAdapter(GrammarNewArray.class, new GrammarNewArrayAdapter(serializationContext, deserializationContext))
-
             .registerTypeAdapter(GrammarNewString.class, new GrammarNewStringAdapter(serializationContext))
-
             .registerTypeAdapter(GrammarNewClassDesc.class, new GrammarNewClassDescAdapter(serializationContext, deserializationContext))
-
-            .registerTypeAdapter(GrammarFieldDesc.class, new GrammarFieldDescAdapter(serializationContext, deserializationContext))
+            .registerTypeAdapter(GrammarFieldDesc.class, new GrammarFieldDescAdapter())
+            .registerTypeAdapter(GrammarBlockdata.class, new GrammarBlockdataAdapter())
 
             // TODO: Avoid this monstruosity somehow, why can't they use the abstract class if there's a type adapter on it ???
             .registerTypeAdapter(Primitive.class, (JsonSerializer<Primitive>) (primitive, _type, _context) -> primitive.asJson())

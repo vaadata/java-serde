@@ -7,7 +7,6 @@ import sh.arnaud.serializeformat.next.stream.types.objects.*;
 
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Map;
 
 public class GrammarNewClassDescAdapter implements JsonSerializer<GrammarNewClassDesc>, JsonDeserializer<GrammarNewClassDesc> {
     private final SerializationContext serializationContext;
