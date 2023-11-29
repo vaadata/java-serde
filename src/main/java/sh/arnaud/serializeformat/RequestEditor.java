@@ -12,7 +12,6 @@ import burp.api.montoya.ui.editor.extension.ExtensionProvidedHttpRequestEditor;
 import burp.api.montoya.utilities.CompressionType;
 import burp.api.montoya.utilities.CompressionUtils;
 import sh.arnaud.serializeformat.de.Deserialize;
-import sh.arnaud.serializeformat.de.FromStream;
 import sh.arnaud.serializeformat.ser.Serialize;
 
 import java.awt.*;

@@ -20,6 +20,7 @@
           "@type": "[Ljava/lang/String;"
         }
       ],
+      "@annotations": [],
       "@super": null
     },
     "@data": [
@@ -32,6 +33,7 @@
               "@serial": -6118465897992725863,
               "@flags": 2,
               "@fields": [],
+              "@annotations": [],
               "@super": null
             },
             "@items": [
@@ -42,6 +44,7 @@
                   "@serial": -6849794470754667710,
                   "@flags": 2,
                   "@fields": [],
+                  "@annotations": [],
                   "@super": null
                 },
                 "@handle": 8257544
@@ -58,12 +61,14 @@
                       "@type": "I"
                     }
                   ],
+                  "@annotations": [],
                   "@super": {
                     "@handle": 8257546,
                     "@name": "java.lang.Number",
                     "@serial": -8742448824652078965,
                     "@flags": 2,
                     "@fields": [],
+                    "@annotations": [],
                     "@super": null
                   }
                 },
@@ -83,6 +88,7 @@
               "@serial": -101421563860753893,
               "@flags": 2,
               "@fields": [],
+              "@annotations": [],
               "@super": null
             },
             "@items": [
@@ -136,22 +142,15 @@
               "@serial": -5921575005990323385,
               "@flags": 2,
               "@fields": [],
+              "@annotations": [],
               "@super": null
             },
             "@items": [
-              {
-                "@value": "Hello, world"
-              },
-              {
-                "@value": "Lorem ipsum"
-              },
+              "Hello, world",
+              "Lorem ipsum",
               null,
-              {
-                "@value": "I'm secret!"
-              },
-              {
-                "@value": "Hello, world"
-              }
+              "I'm secret!",
+              "Hello, world"
             ],
             "@handle": 8257553
           }

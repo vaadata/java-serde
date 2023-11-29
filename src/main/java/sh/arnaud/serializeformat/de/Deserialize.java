@@ -1,5 +1,7 @@
 package sh.arnaud.serializeformat.de;
 
+import sh.arnaud.serializeformat.next.stream.FromStream;
+
 import java.nio.ByteBuffer;
 
 public class Deserialize {

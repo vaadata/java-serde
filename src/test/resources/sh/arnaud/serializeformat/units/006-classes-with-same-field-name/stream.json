@@ -1,0 +1,57 @@
+[
+  {
+    "@handle": 8257538,
+    "@class": {
+      "@handle": 8257536,
+      "@name": "ArrayNullElement$A",
+      "@serial": -3018275438310061744,
+      "@flags": 2,
+      "@fields": [
+        {
+          "@name": "one",
+          "@type": "Ljava/lang/String;"
+        }
+      ],
+      "@annotations": [],
+      "@super": null
+    },
+    "@data": [
+      {
+        "@values": [
+          "My string"
+        ],
+        "@annotations": []
+      }
+    ]
+  },
+  {
+    "@handle": 8257541,
+    "@class": {
+      "@handle": 8257540,
+      "@name": "ArrayNullElement$B",
+      "@serial": -324213145540467233,
+      "@flags": 2,
+      "@fields": [
+        {
+          "@name": "one",
+          "@type": "Ljava/lang/String;"
+        },
+        {
+          "@name": "two",
+          "@type": "Ljava/lang/String;"
+        }
+      ],
+      "@annotations": [],
+      "@super": null
+    },
+    "@data": [
+      {
+        "@values": [
+          "My string",
+          "My string"
+        ],
+        "@annotations": []
+      }
+    ]
+  }
+]

@@ -6,12 +6,14 @@
       "@serial": 0,
       "@flags": 18,
       "@fields": [],
+      "@annotations": [],
       "@super": {
         "@handle": 8257537,
         "@name": "java.lang.Enum",
         "@serial": 0,
         "@flags": 18,
         "@fields": [],
+        "@annotations": [],
         "@super": null
       }
     },

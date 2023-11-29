@@ -3,10 +3,11 @@ package sh.arnaud.serializeformat.ser;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.google.gson.JsonPrimitive;
-import sh.arnaud.serializeformat.grammar.*;
-import sh.arnaud.serializeformat.grammar.classdesc.ClassDesc;
-import sh.arnaud.serializeformat.grammar.classdesc.TypeReferenceClassDesc;
-import sh.arnaud.serializeformat.grammar.classdesc.TypecodeClassDesc;
+import sh.arnaud.serializeformat.next.stream.types.FieldTypeCode;
+import sh.arnaud.serializeformat.next.stream.types.GrammarContent;
+import sh.arnaud.serializeformat.next.stream.types.GrammarStream;
+import sh.arnaud.serializeformat.next.stream.types.objects.*;
+import sh.arnaud.serializeformat.next.stream.types.primitives.PrimitiveJson;
 
 import java.nio.ByteBuffer;
 import java.util.*;
@@ -16,34 +17,54 @@ import static java.io.ObjectStreamConstants.*;
 @SuppressWarnings("UnstableApiUsage")
 public class ToStream {
     private final ByteArrayDataOutput buffer = ByteStreams.newDataOutput();
-    private final Map<Integer, Integer> handleMapping = new HashMap<>();
-    private final Map<String, Integer> encounteredString = new HashMap<>();
+    private final Map<GrammarObject, Integer> seen = new HashMap<>();
+
+    // It may happen that multiple instance of GrammarNewString exists for the same String, we use another map to track
+    // this special case.
+    private final Map<String, Integer> seenStrings = new HashMap<>();
     private int currentHandle = baseWireHandle;
 
-    private int nextHandle(int premappingHandle) {
-        // TODO: Check if duplicate and throw an error
-        handleMapping.put(premappingHandle, currentHandle);
-        return currentHandle++;
-    }
-
-    private int getMapped(int handle) {
-        System.out.println(handleMapping);
-        return handleMapping.get(handle);
-    }
-
-    public ByteBuffer serialize(List<TypeContent> contents) throws Exception {
+    public ByteBuffer serialize(GrammarStream stream) throws Exception {
         buffer.writeShort(STREAM_MAGIC);
         buffer.writeShort(STREAM_VERSION);
 
-        for (var content : contents) {
+        for (var content : stream.contents) {
             writeContent(content);
         }
 
         return ByteBuffer.wrap(buffer.toByteArray());
     }
 
-    private void writeContent(TypeContent content) throws Exception {
-        if (content instanceof TypeObject object) {
+    private void writeContent(GrammarContent content) throws Exception {
+        if (content == null) {
+            buffer.writeByte(TC_NULL);
+            return;
+        }
+
+        if (content instanceof GrammarNewObject newObject) {
+            writeNewObject(newObject);
+            return;
+        }
+
+        if (content instanceof GrammarNewEnum newEnum) {
+            writeNewEnum(newEnum);
+            return;
+        }
+
+        if (content instanceof GrammarNewString newString) {
+            writeNewString(newString);
+            return;
+        }
+
+        if (content instanceof GrammarNewClass newClass) {
+            writeNewClass(newClass);
+            return;
+        }
+
+        System.out.println(content);
+        throw new UnsupportedOperationException("Serialization of content not implemented yet!");
+
+        /*if (content instanceof TypeObject object) {
             writeNewObject(object);
         } else if (content instanceof TypeEnum newEnum) {
 
@@ -60,38 +81,101 @@ public class ToStream {
         } else {
             System.out.println(content);
             throw new UnsupportedOperationException("Not yet implemented!");
+        }*/
+    }
+
+    private void writeNewClass(GrammarNewClass newClass) throws Exception {
+        // We already saw this object, make a reference instead.
+        if (seen.containsKey(newClass)) {
+            buffer.writeByte(TC_REFERENCE);
+            buffer.writeInt(seen.get(newClass));
+            return;
+        }
+
+        buffer.writeByte(TC_CLASS);
+        writeClassDesc(newClass.classDesc);
+        seen.put(newClass, currentHandle++);
+    }
+
+    private void writeNewEnum(GrammarNewEnum newEnum) throws Exception {
+        // We already saw this object, make a reference instead.
+        if (seen.containsKey(newEnum)) {
+            buffer.writeByte(TC_REFERENCE);
+            buffer.writeInt(seen.get(newEnum));
+            return;
+        }
+
+        buffer.writeByte(TC_ENUM);
+        writeClassDesc(newEnum.classDesc);
+
+        seen.put(newEnum, currentHandle++);
+
+        writeNewString(newEnum.enumConstantName);
+    }
+
+    private void writeNewArray(GrammarNewArray array) throws Exception {
+        /*if (object == null) {
+            buffer.writeByte(TC_NULL);
+            return;
+        }*/
+
+        // We already saw this object, make a reference instead.
+        if (seen.containsKey(array)) {
+            buffer.writeByte(TC_REFERENCE);
+            buffer.writeInt(seen.get(array));
+            return;
+        }
+
+        buffer.writeByte(TC_ARRAY);
+        writeClassDesc(array.classDesc);
+
+        seen.put(array, currentHandle++);
+
+        buffer.writeInt(array.values.size());
+
+
+        // TODO: Check validity of asTypecodeClassDesc
+        GrammarFieldDesc fakeField = new GrammarFieldDesc(
+                FieldTypeCode.fromByte(array.classDesc.className.getBytes()[1]).orElseThrow(() -> new Exception("Array wrong item class name")),
+                null,
+                null
+        );
+
+        for (var item : array.values) {
+            writeValue(item, fakeField);
         }
     }
 
-    private void writeNewObject(TypeObject object) throws Exception {
+    private void writeNewObject(GrammarNewObject object) throws Exception {
         if (object == null) {
             buffer.writeByte(TC_NULL);
             return;
         }
 
         // We already saw this object, make a reference instead.
-        if (handleMapping.containsKey(object.handle)) {
+        if (seen.containsKey(object)) {
             buffer.writeByte(TC_REFERENCE);
-            buffer.writeInt(handleMapping.get(object.handle));
+            buffer.writeInt(seen.get(object));
             return;
         }
 
         buffer.writeByte(TC_OBJECT);
         writeClassDesc(object.classDesc);
-        nextHandle(object.handle);
+
+        seen.put(object, currentHandle++);
 
 
-        List<TypecodeClassDesc> chain = new ArrayList<>();
+        List<GrammarNewClassDesc> chain = new ArrayList<>();
 
         var current = object.classDesc;
         while (current != null) {
-            current.asTypecodeClassDesc().ifPresent(chain::add);
-            current = current.superClassDesc();
+            chain.add(current);
+            current = current.classDescInfo.superClassDesc;
         }
 
         Collections.reverse(chain);
 
-        // TODO: Assert chain length is the same as the classdata
+        // TODO: Assert chain length is the same as the classdata length (in case wrong number of super class)
 
         int i = 0;
         for (var c : chain) {
@@ -99,54 +183,120 @@ public class ToStream {
         }
     }
 
-    private void writeValue(Object value, TypeFieldDesc field) throws Exception {
-        if (value instanceof TypeGeneric) {
-            value = ((TypeGeneric) value).value;
+    private void writeClassDesc(GrammarNewClassDesc classDesc) throws Exception {
+        if (classDesc == null) {
+            buffer.writeByte(TC_NULL);
+            return;
         }
 
-        switch (field.typecode) {
-            case Byte -> buffer.writeByte(((JsonPrimitive)value).getAsByte());
-            case Char -> buffer.writeChar(((JsonPrimitive)value).getAsString().charAt(0));
-            case Double -> buffer.writeDouble(((JsonPrimitive)value).getAsDouble());
-            case Float -> buffer.writeFloat(((JsonPrimitive)value).getAsFloat());
-            case Integer -> buffer.writeInt(((JsonPrimitive)value).getAsInt());
-            case Long -> buffer.writeLong(((JsonPrimitive)value).getAsLong());
-            case Short -> buffer.writeShort(((JsonPrimitive)value).getAsShort());
-            case Boolean -> buffer.writeBoolean(((JsonPrimitive)value).getAsBoolean());
-            case Array -> writeNewArray((TypeArray)value);
-            case Object -> {
-                if (value instanceof JsonPrimitive primitive && primitive.isString()) {
-                    writeNewString(primitive.getAsString());
-                } else if (value instanceof TypeClass clas) {
-                    writeNewClass(clas);
-                } else if (value instanceof String str) {
-                    writeNewString(str);
-                } else {
-                    writeNewObject((TypeObject) value);
+        if (seen.containsKey(classDesc)) {
+            buffer.writeByte(TC_REFERENCE);
+            buffer.writeInt(seen.get(classDesc));
+            return;
+        }
+
+        buffer.writeByte(TC_CLASSDESC);
+        writeUtf(classDesc.className);
+        buffer.writeLong(classDesc.serialVersionUID);
+        var handle = currentHandle++;
+        seen.put(classDesc, handle);
+
+        var infos = classDesc.classDescInfo;
+        buffer.write(infos.classDescFlags);
+
+        // TODO: Overflow if fields size is bigger than a short
+        buffer.writeShort(infos.fields.size());
+        for (var field : infos.fields) {
+            buffer.writeByte(field.typeCode.typecode);
+            writeUtf(field.fieldName);
+            if (!field.typeCode.isPrimitive) {
+                writeNewString(field.className1);
+            }
+        }
+
+        for (var annotation : infos.annotations) {
+            writeContent(annotation);
+        }
+
+        buffer.writeByte(TC_ENDBLOCKDATA);
+
+        writeClassDesc(classDesc.classDescInfo.superClassDesc);
+    }
+
+    private void writeNewString(GrammarNewString string) {
+        if (seenStrings.containsKey(string.string)) {
+            buffer.writeByte(TC_REFERENCE);
+            buffer.writeInt(seenStrings.get(string.string));
+            return;
+        }
+
+        seenStrings.put(string.string, currentHandle++);
+
+        // TODO: Check if it's okay with negative shorts
+        if (string.string.length() > 0xffff) {
+            buffer.writeByte(TC_LONGSTRING);
+            buffer.writeLong(string.string.length());
+        } else {
+            buffer.write(TC_STRING);
+            buffer.writeShort(string.string.length());
+        }
+
+        buffer.write(string.string.getBytes());
+    }
+
+    private void writeValue(GrammarObject value, GrammarFieldDesc field) throws Exception {
+        switch (field.typeCode) {
+            case Array -> writeNewArray((GrammarNewArray) value);
+            case Object -> writeContent(value);
+            default -> {
+                // TODO: Maybe move this to another function ?
+
+                // Edge-case, when parsing the JSON document we're not aware if a string is here to represent a char or not.
+                // We fix this issue here when we have all the information we need.
+                if (value instanceof GrammarNewString newString && field.typeCode == FieldTypeCode.Char) {
+                    buffer.writeChar(newString.string.charAt(0));
+                    return;
+                }
+
+                if (!(value instanceof PrimitiveJson primitive)) {
+                    System.out.println(field.typeCode);
+                    System.out.println(value);
+                    throw new UnsupportedOperationException("Not implemented yet!");
+                }
+
+                switch (field.typeCode) {
+                    case Byte -> buffer.writeByte(primitive.asByte());
+                    case Char -> buffer.writeChar(primitive.asChar());
+                    case Double -> buffer.writeDouble(primitive.asDouble());
+                    case Float -> buffer.writeFloat(primitive.asFloat());
+                    case Integer -> buffer.writeInt(primitive.asInt());
+                    case Long -> buffer.writeLong(primitive.asLong());
+                    case Short -> buffer.writeShort(primitive.asShort());
+                    case Boolean -> buffer.writeBoolean(primitive.asBoolean());
                 }
             }
         }
     }
 
-    private void writeNewClass(TypeClass clas) throws Exception {
-        /*if (object == null) {
-            buffer.writeByte(TC_NULL);
-            return;
-        }*/
-
-        // We already saw this object, make a reference instead.
-        if (handleMapping.containsKey(clas.handle)) {
-            buffer.writeByte(TC_REFERENCE);
-            buffer.writeInt(handleMapping.get(clas.handle));
-            return;
-        }
-
-        buffer.writeByte(TC_CLASS);
-        writeClassDesc(clas.classDesc);
-        nextHandle(clas.handle);
-    }
-
-    private void writeClassdata(TypecodeClassDesc classDesc, ClassData classData) throws Exception {
+//    private void writeNewClass(TypeClass clas) throws Exception {
+//        /*if (object == null) {
+//            buffer.writeByte(TC_NULL);
+//            return;
+//        }*/
+//
+//        // We already saw this object, make a reference instead.
+//        if (handleMapping.containsKey(clas.handle)) {
+//            buffer.writeByte(TC_REFERENCE);
+//            buffer.writeInt(handleMapping.get(clas.handle));
+//            return;
+//        }
+//
+//        buffer.writeByte(TC_CLASS);
+//        writeClassDesc(clas.classDesc);
+//        nextHandle(clas.handle);
+//    }
+//
+    private void writeClassdata(GrammarNewClassDesc classDesc, GrammarClassdata classData) throws Exception {
         if (classDesc.classDescInfo.isNowrclass() || classDesc.classDescInfo.isWrclass()) {
             for (int index = 0; index < classDesc.classDescInfo.fields.size(); index++) {
                 var field = classDesc.classDescInfo.fields.get(index);
@@ -162,101 +312,101 @@ public class ToStream {
             throw new UnsupportedOperationException("Not yet implemented!");
         }
     }
-
-    private void writeNewArray(TypeArray array) throws Exception {
-        if (handleMapping.containsKey(array.handle)) {
-            buffer.writeByte(TC_REFERENCE);
-            buffer.writeInt(getMapped(array.handle));
-            return;
-        }
-
-        buffer.writeByte(TC_ARRAY);
-
-        writeClassDesc(array.classDesc);
-        nextHandle(array.handle);
-        buffer.writeInt(array.items.size());
-
-        // TODO: Check validity of asTypecodeClassDesc
-        TypeFieldDesc fakeField = new TypeFieldDesc(
-                FieldTypeCode.fromByte((byte) array.classDesc.asTypecodeClassDesc().get().className.charAt(1)),
-                null,
-                null
-        );
-
-        for (var item : array.items) {
-            writeValue(item, fakeField);
-        }
-    }
-
-    private void writeClassDesc(ClassDesc classDesc) throws Exception {
-        if (classDesc == null) {
-            buffer.writeByte(TC_NULL);
-        } else if (classDesc instanceof TypeReferenceClassDesc rcd) {
-            buffer.writeByte(TC_REFERENCE);
-
-            System.out.println(rcd.handle);
-            buffer.writeInt(getMapped(rcd.handle));
-        } else {
-            writeNewClassDesc(classDesc);
-        }
-    }
-
-    private void writeNewClassDesc(ClassDesc classDesc) throws Exception {
-        if (classDesc instanceof TypecodeClassDesc tcd) {
-            buffer.writeByte(TC_CLASSDESC);
-            writeUtf(tcd.className);
-            buffer.writeLong(tcd.serialVersionUID);
-            nextHandle(tcd.handle);
-
-            // classdescinfo
-            var infos = tcd.classDescInfo;
-            buffer.writeByte(infos.classDescFlags);
-
-            // TODO: Overflow if fields size is bigger than a short
-            buffer.writeShort(infos.fields.size());
-            for (var field : infos.fields) {
-                buffer.writeByte(field.className1.charAt(0));
-                writeUtf(field.fieldName);
-                if (field.className1.length() > 1) {
-                    writeNewString(field.className1);
-                }
-            }
-
-            for (var annotation : infos.annotations) {
-                writeContent(annotation);
-            }
-
-            buffer.writeByte(TC_ENDBLOCKDATA);
-
-            writeClassDesc(infos.superClassDesc);
-        } else {
-            throw new UnsupportedOperationException("Proxy class desc not handled yet");
-        }
-    }
-
-    private void writeNewString(String string) {
-        // We suppose that the algorithm tries to use a string reference every time the same string appears multiple
-        // times.
-        // TODO: We need to confirm if that's the case (or not for small string for example)
-        if (encounteredString.containsKey(string)) {
-            buffer.writeByte(TC_REFERENCE);
-            buffer.writeInt(encounteredString.get(string));
-            return;
-        }
-
-        // TODO: Check if it's okay with negative shorts
-        if (string.length() > 0xffff) {
-            buffer.writeByte(TC_LONGSTRING);
-            buffer.writeLong(string.length());
-        } else {
-            buffer.write(TC_STRING);
-            buffer.writeShort(string.length());
-        }
-
-        buffer.write(string.getBytes());
-        encounteredString.put(string, currentHandle++);
-    }
-
+//
+//    private void writeNewArray(TypeArray array) throws Exception {
+//        if (handleMapping.containsKey(array.handle)) {
+//            buffer.writeByte(TC_REFERENCE);
+//            buffer.writeInt(getMapped(array.handle));
+//            return;
+//        }
+//
+//        buffer.writeByte(TC_ARRAY);
+//
+//        writeClassDesc(array.classDesc);
+//        nextHandle(array.handle);
+//        buffer.writeInt(array.items.size());
+//
+//        // TODO: Check validity of asTypecodeClassDesc
+//        TypeFieldDesc fakeField = new TypeFieldDesc(
+//                FieldTypeCode.fromByte((byte) array.classDesc.asTypecodeClassDesc().get().className.charAt(1)),
+//                null,
+//                null
+//        );
+//
+//        for (var item : array.items) {
+//            writeValue(item, fakeField);
+//        }
+//    }
+//
+//    private void writeClassDesc(ClassDesc classDesc) throws Exception {
+//        if (classDesc == null) {
+//            buffer.writeByte(TC_NULL);
+//        } else if (classDesc instanceof TypeReferenceClassDesc rcd) {
+//            buffer.writeByte(TC_REFERENCE);
+//
+//            System.out.println(rcd.handle);
+//            buffer.writeInt(getMapped(rcd.handle));
+//        } else {
+//            writeNewClassDesc(classDesc);
+//        }
+//    }
+//
+//    private void writeNewClassDesc(ClassDesc classDesc) throws Exception {
+//        if (classDesc instanceof TypecodeClassDesc tcd) {
+//            buffer.writeByte(TC_CLASSDESC);
+//            writeUtf(tcd.className);
+//            buffer.writeLong(tcd.serialVersionUID);
+//            nextHandle(tcd.handle);
+//
+//            // classdescinfo
+//            var infos = tcd.classDescInfo;
+//            buffer.writeByte(infos.classDescFlags);
+//
+//            // TODO: Overflow if fields size is bigger than a short
+//            buffer.writeShort(infos.fields.size());
+//            for (var field : infos.fields) {
+//                buffer.writeByte(field.className1.charAt(0));
+//                writeUtf(field.fieldName);
+//                if (field.className1.length() > 1) {
+//                    writeNewString(field.className1);
+//                }
+//            }
+//
+//            for (var annotation : infos.annotations) {
+//                writeContent(annotation);
+//            }
+//
+//            buffer.writeByte(TC_ENDBLOCKDATA);
+//
+//            writeClassDesc(infos.superClassDesc);
+//        } else {
+//            throw new UnsupportedOperationException("Proxy class desc not handled yet");
+//        }
+//    }
+//
+//    private void writeNewString(String string) {
+//        // We suppose that the algorithm tries to use a string reference every time the same string appears multiple
+//        // times.
+//        // TODO: We need to confirm if that's the case (or not for small string for example)
+//        if (encounteredString.containsKey(string)) {
+//            buffer.writeByte(TC_REFERENCE);
+//            buffer.writeInt(encounteredString.get(string));
+//            return;
+//        }
+//
+//        // TODO: Check if it's okay with negative shorts
+//        if (string.length() > 0xffff) {
+//            buffer.writeByte(TC_LONGSTRING);
+//            buffer.writeLong(string.length());
+//        } else {
+//            buffer.write(TC_STRING);
+//            buffer.writeShort(string.length());
+//        }
+//
+//        buffer.write(string.getBytes());
+//        encounteredString.put(string, currentHandle++);
+//    }
+//
     private void writeUtf(String string) {
         // TODO: Assert string is not too big
         buffer.writeShort(string.length());

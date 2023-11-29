@@ -4,12 +4,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
-import sh.arnaud.serializeformat.HandleManager;
-import sh.arnaud.serializeformat.grammar.*;
-import sh.arnaud.serializeformat.grammar.classdesc.ClassDescInfo;
-import sh.arnaud.serializeformat.grammar.classdesc.TypeReferenceClassDesc;
-import sh.arnaud.serializeformat.grammar.classdesc.TypecodeClassDesc;
-import sh.arnaud.serializeformat.grammar.classdesc.ClassDesc;
+import sh.arnaud.serializeformat.next.stream.types.GrammarStream;
 import sh.arnaud.serializeformat.serde.Json;
 
 import java.io.ObjectStreamConstants;
@@ -18,22 +13,20 @@ import java.util.*;
 
 @SuppressWarnings("UnstableApiUsage")
 public class FromJson {
-    private final HandleManager resources = new HandleManager();
-
     // The key is the one found in the document, the value is the written one.
     private final Map<Integer, Integer> referenceMapping = new HashMap<>();
     private int currentHandle = ObjectStreamConstants.baseWireHandle;
 
 
 
-    public List<TypeContent> writeStreamFromJson(String s) throws Exception {
+    public GrammarStream writeStreamFromJson(String s) throws Exception {
         /*writeStream(JsonParser.parseString(json));
 
         return ByteBuffer.wrap(buffer.toByteArray());*/
 
         Json json = new Json();
 
-        var yo = json.gson.fromJson(s, new TypeToken<List<TypeContent>>() {});
+        var yo = json.gson.fromJson(s, GrammarStream.class);
 
         System.out.println(yo);
 

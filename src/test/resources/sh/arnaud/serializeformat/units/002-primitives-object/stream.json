@@ -44,6 +44,7 @@
           "@type": "Ljava/lang/Boolean;"
         }
       ],
+      "@annotations": [],
       "@super": null
     },
     "@data": [
@@ -62,12 +63,14 @@
                   "@type": "B"
                 }
               ],
+              "@annotations": [],
               "@super": {
                 "@handle": 8257547,
                 "@name": "java.lang.Number",
                 "@serial": -8742448824652078965,
                 "@flags": 2,
                 "@fields": [],
+                "@annotations": [],
                 "@super": null
               }
             },
@@ -97,6 +100,7 @@
                   "@type": "C"
                 }
               ],
+              "@annotations": [],
               "@super": null
             },
             "@data": [
@@ -121,6 +125,7 @@
                   "@type": "D"
                 }
               ],
+              "@annotations": [],
               "@super": {
                 "@ref": 8257547
               }
@@ -151,6 +156,7 @@
                   "@type": "F"
                 }
               ],
+              "@annotations": [],
               "@super": {
                 "@ref": 8257547
               }
@@ -181,6 +187,7 @@
                   "@type": "I"
                 }
               ],
+              "@annotations": [],
               "@super": {
                 "@ref": 8257547
               }
@@ -211,6 +218,7 @@
                   "@type": "J"
                 }
               ],
+              "@annotations": [],
               "@super": {
                 "@ref": 8257547
               }
@@ -241,6 +249,7 @@
                   "@type": "Z"
                 }
               ],
+              "@annotations": [],
               "@super": null
             },
             "@data": [
@@ -265,6 +274,7 @@
                   "@type": "S"
                 }
               ],
+              "@annotations": [],
               "@super": {
                 "@ref": 8257547
               }

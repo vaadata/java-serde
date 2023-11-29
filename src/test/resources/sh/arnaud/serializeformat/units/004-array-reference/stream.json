@@ -12,6 +12,7 @@
           "@type": "[B"
         }
       ],
+      "@annotations": [],
       "@super": null
     },
     "@data": [
@@ -24,24 +25,15 @@
               "@serial": -5984413125824719648,
               "@flags": 2,
               "@fields": [],
+              "@annotations": [],
               "@super": null
             },
             "@items": [
-              {
-                "@value": 1
-              },
-              {
-                "@value": 2
-              },
-              {
-                "@value": 3
-              },
-              {
-                "@value": 4
-              },
-              {
-                "@value": 5
-              }
+              1,
+              2,
+              3,
+              4,
+              5
             ],
             "@handle": 8257540
           }
