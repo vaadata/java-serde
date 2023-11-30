@@ -74,18 +74,7 @@
                 "@super": null
               }
             },
-            "@data": [
-              {
-                "@values": [],
-                "@annotations": []
-              },
-              {
-                "@values": [
-                  42
-                ],
-                "@annotations": []
-              }
-            ]
+            "@data": 42
           },
           {
             "@handle": 8257550,
@@ -103,14 +92,7 @@
               "@annotations": [],
               "@super": null
             },
-            "@data": [
-              {
-                "@values": [
-                  "!"
-                ],
-                "@annotations": []
-              }
-            ]
+            "@data": "!"
           },
           {
             "@handle": 8257552,
@@ -130,18 +112,7 @@
                 "@ref": 8257547
               }
             },
-            "@data": [
-              {
-                "@values": [],
-                "@annotations": []
-              },
-              {
-                "@values": [
-                  42.1337
-                ],
-                "@annotations": []
-              }
-            ]
+            "@data": 42.1337
           },
           {
             "@handle": 8257554,
@@ -161,18 +132,7 @@
                 "@ref": 8257547
               }
             },
-            "@data": [
-              {
-                "@values": [],
-                "@annotations": []
-              },
-              {
-                "@values": [
-                  420.69
-                ],
-                "@annotations": []
-              }
-            ]
+            "@data": 420.69
           },
           {
             "@handle": 8257556,
@@ -192,18 +152,7 @@
                 "@ref": 8257547
               }
             },
-            "@data": [
-              {
-                "@values": [],
-                "@annotations": []
-              },
-              {
-                "@values": [
-                  2147483647
-                ],
-                "@annotations": []
-              }
-            ]
+            "@data": 2147483647
           },
           {
             "@handle": 8257558,
@@ -223,18 +172,7 @@
                 "@ref": 8257547
               }
             },
-            "@data": [
-              {
-                "@values": [],
-                "@annotations": []
-              },
-              {
-                "@values": [
-                  81985529216486895
-                ],
-                "@annotations": []
-              }
-            ]
+            "@data": 81985529216486895
           },
           {
             "@handle": 8257560,
@@ -252,14 +190,7 @@
               "@annotations": [],
               "@super": null
             },
-            "@data": [
-              {
-                "@values": [
-                  true
-                ],
-                "@annotations": []
-              }
-            ]
+            "@data": true
           },
           {
             "@handle": 8257562,
@@ -279,32 +210,14 @@
                 "@ref": 8257547
               }
             },
-            "@data": [
-              {
-                "@values": [],
-                "@annotations": []
-              },
-              {
-                "@values": [
-                  4919
-                ],
-                "@annotations": []
-              }
-            ]
+            "@data": 4919
           },
           {
             "@handle": 8257563,
             "@class": {
               "@ref": 8257559
             },
-            "@data": [
-              {
-                "@values": [
-                  false
-                ],
-                "@annotations": []
-              }
-            ]
+            "@data": false
           }
         ],
         "@annotations": []

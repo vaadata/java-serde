@@ -97,18 +97,7 @@
                 "@class": {
                   "@ref": 8257545
                 },
-                "@data": [
-                  {
-                    "@values": [],
-                    "@annotations": []
-                  },
-                  {
-                    "@values": [
-                      42
-                    ],
-                    "@annotations": []
-                  }
-                ]
+                "@data": 42
               },
               null,
               {
@@ -116,18 +105,7 @@
                 "@class": {
                   "@ref": 8257545
                 },
-                "@data": [
-                  {
-                    "@values": [],
-                    "@annotations": []
-                  },
-                  {
-                    "@values": [
-                      101
-                    ],
-                    "@annotations": []
-                  }
-                ]
+                "@data": 101
               },
               {
                 "@ref": 8257550
