@@ -26,6 +26,8 @@ public class GrammarObjectAdapter implements JsonDeserializer<GrammarObject> {
                 return deserializationContext.find(handle);
             }
 
+
+
             if (object.has("@handle") && object.has("@class") && object.has("@data")) {
                 return context.deserialize(src, GrammarNewObject.class);
             }

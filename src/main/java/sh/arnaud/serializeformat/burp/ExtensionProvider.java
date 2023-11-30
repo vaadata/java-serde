@@ -4,7 +4,7 @@ import burp.api.montoya.MontoyaApi;
 import burp.api.montoya.ui.editor.extension.*;
 
 public class ExtensionProvider implements HttpRequestEditorProvider, HttpResponseEditorProvider {
-    final MontoyaApi api;
+    private final MontoyaApi api;
 
     public ExtensionProvider(MontoyaApi api) {
         this.api = api;
