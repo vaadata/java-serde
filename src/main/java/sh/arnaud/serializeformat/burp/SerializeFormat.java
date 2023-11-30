@@ -26,4 +26,18 @@ public class SerializeFormat implements BurpExtension {
             System.out.println(message);
         }
     }
+    public static void err(String message) {
+        if (api != null) {
+            api.logging().logToError(message);
+        } else {
+            System.err.println(message);
+        }
+    }
+    public static void err(Exception message) {
+        if (api != null) {
+            api.logging().logToError(message);
+        } else {
+            System.err.println(message);
+        }
+    }
 }

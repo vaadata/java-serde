@@ -175,7 +175,7 @@ public class ToStream {
         var current = object.classDesc;
         while (current != null) {
             chain.add(current);
-            current = current.classDescInfo.superClassDesc;
+            current = current.classDescInfo.superClassDesc();
         }
 
         Collections.reverse(chain);
@@ -202,16 +202,16 @@ public class ToStream {
 
         buffer.writeByte(TC_CLASSDESC);
         writeUtf(classDesc.className);
-        buffer.writeLong(classDesc.serialVersionUID);
+        buffer.writeLong(classDesc.serial);
         var handle = currentHandle++;
         seen.put(classDesc, handle);
 
         var infos = classDesc.classDescInfo;
-        buffer.write(infos.classDescFlags);
+        buffer.write(infos.classDescFlags());
 
         // TODO: Overflow if fields size is bigger than a short
-        buffer.writeShort(infos.fields.size());
-        for (var field : infos.fields) {
+        buffer.writeShort(infos.fields().size());
+        for (var field : infos.fields()) {
             buffer.writeByte(field.typeCode.typecode);
             writeUtf(field.fieldName);
             if (!field.typeCode.isPrimitive) {
@@ -219,13 +219,13 @@ public class ToStream {
             }
         }
 
-        for (var annotation : infos.annotations) {
+        for (var annotation : infos.annotations()) {
             writeContent(annotation);
         }
 
         buffer.writeByte(TC_ENDBLOCKDATA);
 
-        writeClassDesc(classDesc.classDescInfo.superClassDesc);
+        writeClassDesc(classDesc.classDescInfo.superClassDesc());
     }
 
     private void writeNewString(GrammarNewString string) {
@@ -315,9 +315,9 @@ public class ToStream {
 //
     private void writeClassdata(GrammarNewClassDesc classDesc, GrammarClassdata classData) throws Exception {
         if (classDesc.classDescInfo.isNowrclass() || classDesc.classDescInfo.isWrclass()) {
-            for (int index = 0; index < classDesc.classDescInfo.fields.size(); index++) {
-                var field = classDesc.classDescInfo.fields.get(index);
-                var value = classData.values.get(index);
+            for (int index = 0; index < classDesc.classDescInfo.fields().size(); index++) {
+                var field = classDesc.classDescInfo.fields().get(index);
+                var value = classData.values().get(index);
 
                 writeValue(value, field);
             }
@@ -326,7 +326,7 @@ public class ToStream {
         }
 
         if (classDesc.classDescInfo.isWrclass()) {
-            for (var annotation : classData.annotations) {
+            for (var annotation : classData.annotations()) {
                 writeContent(annotation);
             }
             buffer.writeByte(TC_ENDBLOCKDATA);

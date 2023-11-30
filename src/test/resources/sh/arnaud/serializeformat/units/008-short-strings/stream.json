@@ -1,0 +1,55 @@
+[
+  {
+    "@handle": 8257538,
+    "@class": {
+      "@handle": 8257536,
+      "@name": "ShortStrings",
+      "@serial": 6641095772748408135,
+      "@flags": 2,
+      "@fields": [
+        {
+          "@name": "string",
+          "@type": "Ljava/lang/String;"
+        }
+      ],
+      "@annotations": [],
+      "@super": null
+    },
+    "@data": [
+      {
+        "@values": [
+          "foo"
+        ],
+        "@annotations": []
+      }
+    ]
+  },
+  {
+    "@handle": 8257540,
+    "@class": {
+      "@ref": 8257536
+    },
+    "@data": [
+      {
+        "@values": [
+          "foo"
+        ],
+        "@annotations": []
+      }
+    ]
+  },
+  {
+    "@handle": 8257542,
+    "@class": {
+      "@ref": 8257536
+    },
+    "@data": [
+      {
+        "@values": [
+          "foo"
+        ],
+        "@annotations": []
+      }
+    ]
+  }
+]

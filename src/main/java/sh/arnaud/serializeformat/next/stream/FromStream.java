@@ -186,7 +186,7 @@ public class FromStream {
         var cursor = classDesc;
         while (cursor != null) {
             chain.add(cursor);
-            cursor = cursor.classDescInfo.superClassDesc;
+            cursor = cursor.classDescInfo.superClassDesc();
         }
 
         Collections.reverse(chain);
@@ -202,7 +202,7 @@ public class FromStream {
     }
 
     private GrammarClassdata readClassdata(ByteBuffer data, GrammarNewClassDesc currentClass) throws Exception {
-        byte flag = currentClass.classDescInfo.classDescFlags;
+        byte flag = currentClass.classDescInfo.classDescFlags();
 
         if ((SC_SERIALIZABLE & flag) == SC_SERIALIZABLE) {
             if ((SC_WRITE_METHOD & flag) == SC_WRITE_METHOD) {
@@ -246,7 +246,7 @@ public class FromStream {
     }
 
     private List<GrammarObject> readValues(ByteBuffer data, GrammarNewClassDesc currentClass) throws Exception {
-        var fields = currentClass.classDescInfo.fields;
+        var fields = currentClass.classDescInfo.fields();
 
         List<GrammarObject> list = new ArrayList<>(fields.size());
 

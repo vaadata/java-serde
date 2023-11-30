@@ -6,17 +6,7 @@ import sh.arnaud.serializeformat.next.stream.types.GrammarContent;
 
 import java.util.List;
 
-public class GrammarClassdata {
-    @Expose
-    @SerializedName("@values")
-    public final List<GrammarObject> values;
-
-    @Expose
-    @SerializedName("@annotations")
-    public final List<GrammarContent> annotations;
-
-    public GrammarClassdata(List<GrammarObject> values, List<GrammarContent> annotations) {
-        this.values = values;
-        this.annotations = annotations;
-    }
-}
+public record GrammarClassdata(
+        @Expose @SerializedName("@values") List<GrammarObject> values,
+        @Expose @SerializedName("@annotations") List<GrammarContent> annotations
+) { }

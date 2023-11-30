@@ -51,11 +51,11 @@ public class GrammarNewClassDescAdapter implements JsonSerializer<GrammarNewClas
             var object = new JsonObject();
             object.addProperty("@handle", handle);
             object.addProperty("@name", src.className);
-            object.addProperty("@serial", src.serialVersionUID);
-            object.addProperty("@flags", src.classDescInfo.classDescFlags);
-            object.add("@fields", context.serialize(src.classDescInfo.fields));
-            object.add("@annotations", context.serialize(src.classDescInfo.annotations));
-            object.add("@super", context.serialize(src.classDescInfo.superClassDesc));
+            object.addProperty("@serial", src.serial);
+            object.addProperty("@flags", src.classDescInfo.classDescFlags());
+            object.add("@fields", context.serialize(src.classDescInfo.fields()));
+            object.add("@annotations", context.serialize(src.classDescInfo.annotations()));
+            object.add("@super", context.serialize(src.classDescInfo.superClassDesc()));
 
             return object;
         });

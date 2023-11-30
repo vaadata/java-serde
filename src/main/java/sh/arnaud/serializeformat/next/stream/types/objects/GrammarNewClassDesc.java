@@ -4,12 +4,12 @@ import sh.arnaud.serializeformat.next.stream.types.FieldTypeCode;
 
 public class GrammarNewClassDesc extends GrammarObject {
     public final String className;
-    public final long serialVersionUID;
+    public final long serial;
     public GrammarClassDescInfo classDescInfo;
 
     public GrammarNewClassDesc(String className, long serialVersionUID) {
         this.className = className;
-        this.serialVersionUID = serialVersionUID;
+        this.serial = serialVersionUID;
     }
 
     public FieldTypeCode asTypeCode() throws Exception {

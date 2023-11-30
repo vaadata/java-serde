@@ -17,6 +17,8 @@ import sh.arnaud.serializeformat.ser.Serialize;
 import java.awt.*;
 import java.util.Arrays;
 
+import static burp.api.montoya.core.ByteArray.byteArray;
+
 public class ResponseEditor implements ExtensionProvidedHttpResponseEditor {
     private final RawEditor editor;
     private final CompressionUtils compressionUtils;
@@ -40,13 +42,14 @@ public class ResponseEditor implements ExtensionProvidedHttpResponseEditor {
             var body1 = requestResponse.response().body();
             var body2 = compressionUtils.decompress(body1, CompressionType.GZIP);
             var stream = Deserialize.deserialize(body2.getBytes());
-            editor.setContents(ByteArray.byteArray(stream));
+            editor.setContents(byteArray(stream));
 
             // TODO: Delete this is used to see if everything works correctly
-            SerializeFormat.log("response");
-            SerializeFormat.log(stream);
+            // TODO: Maybe warning about inconstitency
             if (!Arrays.equals(Serialize.serialize(stream).array(), body2.getBytes())) {
-                throw new Exception("Differential with JSON and value");
+                SerializeFormat.err("Inconsitency");
+                SerializeFormat.log("request");
+                SerializeFormat.log(stream);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

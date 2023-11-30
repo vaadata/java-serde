@@ -27,6 +27,34 @@ class FromSerializedTest {
         return new String(hexChars, StandardCharsets.UTF_8);
     }
 
+    private static byte[] readFile(File file) throws IOException {
+        try (var input = new FileInputStream(file)) {
+            return input.readAllBytes();
+        }
+    }
+
+    private static DynamicTest generateTest(File file) {
+        var jsonFile = Paths.get(file.getPath(), "stream.json").toFile();
+        var binFile = Paths.get(file.getPath(), "stream.bin").toFile();
+        var binReverseFile = Paths.get(file.getPath(), "stream-reverse.bin").toFile();
+
+        return DynamicTest.dynamicTest(file.getName(), () -> {
+            var json = readFile(jsonFile);
+            var bin = readFile(binFile);
+            var binReverse = binReverseFile.isFile() ? readFile(binReverseFile) : bin;
+
+            var outputJson = Deserialize.deserialize(bin);
+
+            assertEquals(new String(json), outputJson);
+
+            var outputBin = Serialize.serialize(outputJson);
+
+            assertEquals(bytesToHex(binReverse), bytesToHex(outputBin.array()));
+
+            assertArrayEquals(binReverse, outputBin.array());
+        });
+    }
+
     @TestFactory
     Stream<DynamicTest> dynamicTests() {
         var units = getClass().getResource("units");
@@ -44,31 +72,6 @@ class FromSerializedTest {
 
         return Stream.of(unitsFiles)
                 .filter(File::isDirectory)
-                .map((file) -> {
-                    var streamText = Paths.get(file.getPath(), "stream.bin").toFile();
-                    var streamJson = Paths.get(file.getPath(), "stream.json").toFile();
-
-                    return DynamicTest.dynamicTest(file.getName(), () -> {
-                        ByteBuffer text;
-                        String json;
-
-                        try (var textInput = new FileInputStream(streamText); var streamInput = new FileInputStream(streamJson)) {
-                            text = ByteBuffer.wrap(textInput.readAllBytes());
-                            json = new String(streamInput.readAllBytes());
-                        }
-
-                        var output = Deserialize.deserialize(text.duplicate());
-
-                        assertEquals(json, output);
-
-                        var back = Serialize.serialize(output);
-
-                        System.out.print("expected: ");
-                        System.out.println(bytesToHex(text.array()));
-                        System.out.print("  actual: ");
-                        System.out.println(bytesToHex(back.array()));
-                        assertArrayEquals(text.array(), back.array());
-                    });
-                });
+                .map(FromSerializedTest::generateTest);
     }
 }
