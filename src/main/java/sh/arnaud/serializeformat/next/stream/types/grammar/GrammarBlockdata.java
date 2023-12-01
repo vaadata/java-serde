@@ -1,4 +1,4 @@
-package sh.arnaud.serializeformat.next.stream.types;
+package sh.arnaud.serializeformat.next.stream.types.grammar;
 
 public class GrammarBlockdata extends GrammarContent {
     public final byte[] blockdata;

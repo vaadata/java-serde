@@ -2,10 +2,10 @@ package sh.arnaud.serializeformat.adapters;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
-import sh.arnaud.serializeformat.next.stream.types.objects.GrammarClassdata;
-import sh.arnaud.serializeformat.next.stream.types.objects.GrammarNewClassDesc;
-import sh.arnaud.serializeformat.next.stream.types.objects.GrammarNewObject;
-import sh.arnaud.serializeformat.next.stream.types.objects.GrammarObject;
+import sh.arnaud.serializeformat.next.stream.types.grammar.GrammarClassdata;
+import sh.arnaud.serializeformat.next.stream.types.grammar.GrammarNewClassDesc;
+import sh.arnaud.serializeformat.next.stream.types.grammar.GrammarNewObject;
+import sh.arnaud.serializeformat.next.stream.types.grammar.GrammarObject;
 import sh.arnaud.serializeformat.next.stream.types.primitives.*;
 
 import java.lang.reflect.Type;

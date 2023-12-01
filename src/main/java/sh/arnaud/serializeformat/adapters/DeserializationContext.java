@@ -1,7 +1,7 @@
 package sh.arnaud.serializeformat.adapters;
 
 import com.google.gson.JsonParseException;
-import sh.arnaud.serializeformat.next.stream.types.objects.GrammarObject;
+import sh.arnaud.serializeformat.next.stream.types.grammar.GrammarObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,6 +17,12 @@ public class DeserializationContext {
         storage.put(object, handle);
     }
 
+    /**
+     * Try to find an object from the storage, throws an exception if not found.
+     *
+     * @param handle The resource's handle
+     * @return Resource with the given handle
+     */
     public GrammarObject find(int handle) {
         return storage.entrySet().stream()
                 .filter(set -> set.getValue() == handle)
@@ -28,6 +34,13 @@ public class DeserializationContext {
                 });
     }
 
+    /**
+     * Same as {@link #find(int)} but also checks the type of the resource.
+     *
+     * @param handle The resource's handle
+     * @param type The object type
+     * @return Resource with the given handle
+     */
     public <T> T find(int handle, Class<T> type) {
         var object = find(handle);
 

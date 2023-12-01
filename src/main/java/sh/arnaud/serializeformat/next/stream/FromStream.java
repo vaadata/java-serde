@@ -1,10 +1,10 @@
 package sh.arnaud.serializeformat.next.stream;
 
 import sh.arnaud.serializeformat.next.stream.types.FieldTypeCode;
-import sh.arnaud.serializeformat.next.stream.types.GrammarBlockdata;
-import sh.arnaud.serializeformat.next.stream.types.GrammarContent;
-import sh.arnaud.serializeformat.next.stream.types.GrammarStream;
-import sh.arnaud.serializeformat.next.stream.types.objects.*;
+import sh.arnaud.serializeformat.next.stream.types.grammar.GrammarBlockdata;
+import sh.arnaud.serializeformat.next.stream.types.grammar.GrammarContent;
+import sh.arnaud.serializeformat.next.stream.types.grammar.GrammarStream;
+import sh.arnaud.serializeformat.next.stream.types.grammar.*;
 import sh.arnaud.serializeformat.next.stream.types.primitives.*;
 
 import java.nio.ByteBuffer;
@@ -59,14 +59,6 @@ public class FromStream {
             contents.add(readContent(data));
         }
 
-        /*var classes = resources.storage.values()
-                .stream()
-                .filter(typeContent -> typeContent instanceof TypecodeClassDesc)
-                .map(typeContent -> (TypecodeClassDesc) typeContent)
-                .collect(Collectors.toList());
-
-        var stream = new TypeStream(classes, list);*/
-
         return new GrammarStream(contents);
     }
 
@@ -109,23 +101,9 @@ public class FromStream {
                 data.get();
                 yield null;
             }
-            //case TC_EXCEPTION -> readException(data);
-            case TC_RESET -> {
-                // Consume the byte from the buffer.
-
-                throw new Exception("Reset are not handled yet!");
-                //data.get();
-
-                //resources.reset();
-
-                //yield null;
-            }
+            // `TC_EXCEPTION` and `TC_RESET` are handled here, may implement them in the future.
             default -> throw new Exception("Unexpected object variant: " + value);
         };
-    }
-
-    private void readException(ByteBuffer data) {
-        throw new UnsupportedOperationException("Not yet implemented!");
     }
 
     private GrammarNewEnum readNewEnum(ByteBuffer data) throws Exception {
@@ -215,21 +193,11 @@ public class FromStream {
                 var values = readValues(data, currentClass);
                 return new GrammarClassdata(values, new ArrayList<>());
             }
-        } else if ((SC_EXTERNALIZABLE & flag) == SC_EXTERNALIZABLE) {
-            if ((SC_BLOCK_DATA & flag) == SC_BLOCK_DATA) {
-                // objectAnnotation
-                readObjectAnnotation(data);
-            } else {
-                // externalContents
-                readExternalContents(data);
-            }
         }
 
-        throw new Exception("Invalid class flags");
-    }
+        // `SC_EXTERNALIZABLE` class are not implemented yet.
 
-    private void readExternalContents(ByteBuffer data) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new Exception("Invalid class flags");
     }
 
     private List<GrammarContent> readObjectAnnotation(ByteBuffer data) throws Exception {
@@ -239,7 +207,7 @@ public class FromStream {
             contents.add(readContent(data));
         }
 
-        // Remove the TC_ENDBLOCKDATA from the buffer.
+        // Remove `TC_ENDBLOCKDATA`.
         data.get();
 
         return contents;

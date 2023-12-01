@@ -1,6 +1,6 @@
 package sh.arnaud.serializeformat.de;
 
-import sh.arnaud.serializeformat.next.stream.types.GrammarStream;
+import sh.arnaud.serializeformat.next.stream.types.grammar.GrammarStream;
 import sh.arnaud.serializeformat.serde.Json;
 
 public class ToJson {

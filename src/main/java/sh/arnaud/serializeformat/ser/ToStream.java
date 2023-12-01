@@ -3,10 +3,10 @@ package sh.arnaud.serializeformat.ser;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import sh.arnaud.serializeformat.next.stream.types.FieldTypeCode;
-import sh.arnaud.serializeformat.next.stream.types.GrammarBlockdata;
-import sh.arnaud.serializeformat.next.stream.types.GrammarContent;
-import sh.arnaud.serializeformat.next.stream.types.GrammarStream;
-import sh.arnaud.serializeformat.next.stream.types.objects.*;
+import sh.arnaud.serializeformat.next.stream.types.grammar.GrammarBlockdata;
+import sh.arnaud.serializeformat.next.stream.types.grammar.GrammarContent;
+import sh.arnaud.serializeformat.next.stream.types.grammar.GrammarStream;
+import sh.arnaud.serializeformat.next.stream.types.grammar.*;
 import sh.arnaud.serializeformat.next.stream.types.primitives.PrimitiveJson;
 
 import java.nio.ByteBuffer;
@@ -332,101 +332,7 @@ public class ToStream {
             buffer.writeByte(TC_ENDBLOCKDATA);
         }
     }
-//
-//    private void writeNewArray(TypeArray array) throws Exception {
-//        if (handleMapping.containsKey(array.handle)) {
-//            buffer.writeByte(TC_REFERENCE);
-//            buffer.writeInt(getMapped(array.handle));
-//            return;
-//        }
-//
-//        buffer.writeByte(TC_ARRAY);
-//
-//        writeClassDesc(array.classDesc);
-//        nextHandle(array.handle);
-//        buffer.writeInt(array.items.size());
-//
-//        // TODO: Check validity of asTypecodeClassDesc
-//        TypeFieldDesc fakeField = new TypeFieldDesc(
-//                FieldTypeCode.fromByte((byte) array.classDesc.asTypecodeClassDesc().get().className.charAt(1)),
-//                null,
-//                null
-//        );
-//
-//        for (var item : array.items) {
-//            writeValue(item, fakeField);
-//        }
-//    }
-//
-//    private void writeClassDesc(ClassDesc classDesc) throws Exception {
-//        if (classDesc == null) {
-//            buffer.writeByte(TC_NULL);
-//        } else if (classDesc instanceof TypeReferenceClassDesc rcd) {
-//            buffer.writeByte(TC_REFERENCE);
-//
-//            System.out.println(rcd.handle);
-//            buffer.writeInt(getMapped(rcd.handle));
-//        } else {
-//            writeNewClassDesc(classDesc);
-//        }
-//    }
-//
-//    private void writeNewClassDesc(ClassDesc classDesc) throws Exception {
-//        if (classDesc instanceof TypecodeClassDesc tcd) {
-//            buffer.writeByte(TC_CLASSDESC);
-//            writeUtf(tcd.className);
-//            buffer.writeLong(tcd.serialVersionUID);
-//            nextHandle(tcd.handle);
-//
-//            // classdescinfo
-//            var infos = tcd.classDescInfo;
-//            buffer.writeByte(infos.classDescFlags);
-//
-//            // TODO: Overflow if fields size is bigger than a short
-//            buffer.writeShort(infos.fields.size());
-//            for (var field : infos.fields) {
-//                buffer.writeByte(field.className1.charAt(0));
-//                writeUtf(field.fieldName);
-//                if (field.className1.length() > 1) {
-//                    writeNewString(field.className1);
-//                }
-//            }
-//
-//            for (var annotation : infos.annotations) {
-//                writeContent(annotation);
-//            }
-//
-//            buffer.writeByte(TC_ENDBLOCKDATA);
-//
-//            writeClassDesc(infos.superClassDesc);
-//        } else {
-//            throw new UnsupportedOperationException("Proxy class desc not handled yet");
-//        }
-//    }
-//
-//    private void writeNewString(String string) {
-//        // We suppose that the algorithm tries to use a string reference every time the same string appears multiple
-//        // times.
-//        // TODO: We need to confirm if that's the case (or not for small string for example)
-//        if (encounteredString.containsKey(string)) {
-//            buffer.writeByte(TC_REFERENCE);
-//            buffer.writeInt(encounteredString.get(string));
-//            return;
-//        }
-//
-//        // TODO: Check if it's okay with negative shorts
-//        if (string.length() > 0xffff) {
-//            buffer.writeByte(TC_LONGSTRING);
-//            buffer.writeLong(string.length());
-//        } else {
-//            buffer.write(TC_STRING);
-//            buffer.writeShort(string.length());
-//        }
-//
-//        buffer.write(string.getBytes());
-//        encounteredString.put(string, currentHandle++);
-//    }
-//
+
     private void writeUtf(String string) {
         // TODO: Assert string is not too big
         buffer.writeShort(string.length());

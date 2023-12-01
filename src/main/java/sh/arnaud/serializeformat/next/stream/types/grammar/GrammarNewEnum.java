@@ -1,5 +1,5 @@
 
-package sh.arnaud.serializeformat.next.stream.types.objects;
+package sh.arnaud.serializeformat.next.stream.types.grammar;
 
 public class GrammarNewEnum extends GrammarObject {
     public final GrammarNewClassDesc classDesc;

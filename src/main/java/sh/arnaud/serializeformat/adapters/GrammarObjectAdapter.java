@@ -4,7 +4,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import sh.arnaud.serializeformat.next.stream.types.objects.*;
+import sh.arnaud.serializeformat.next.stream.types.grammar.*;
 import sh.arnaud.serializeformat.next.stream.types.primitives.PrimitiveJson;
 
 import java.lang.reflect.Type;

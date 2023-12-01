@@ -1,7 +1,7 @@
 package sh.arnaud.serializeformat.adapters;
 
 import com.google.gson.JsonElement;
-import sh.arnaud.serializeformat.next.stream.types.objects.GrammarObject;
+import sh.arnaud.serializeformat.next.stream.types.grammar.GrammarObject;
 
 import java.io.ObjectStreamConstants;
 import java.util.HashMap;

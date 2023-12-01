@@ -1,7 +1,7 @@
 package sh.arnaud.serializeformat.next.stream.types.primitives;
 
 import com.google.gson.JsonPrimitive;
-import sh.arnaud.serializeformat.next.stream.types.objects.GrammarObject;
+import sh.arnaud.serializeformat.next.stream.types.grammar.GrammarObject;
 
 public abstract class Primitive extends GrammarObject {
     public byte asByte() {

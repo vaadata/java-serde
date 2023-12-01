@@ -1,4 +1,4 @@
-package sh.arnaud.serializeformat.next.stream.types.objects;
+package sh.arnaud.serializeformat.next.stream.types.grammar;
 
 import sh.arnaud.serializeformat.next.stream.types.FieldTypeCode;
 

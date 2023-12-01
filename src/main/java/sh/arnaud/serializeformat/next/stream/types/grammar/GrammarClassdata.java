@@ -1,8 +1,7 @@
-package sh.arnaud.serializeformat.next.stream.types.objects;
+package sh.arnaud.serializeformat.next.stream.types.grammar;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import sh.arnaud.serializeformat.next.stream.types.GrammarContent;
 
 import java.util.List;
 

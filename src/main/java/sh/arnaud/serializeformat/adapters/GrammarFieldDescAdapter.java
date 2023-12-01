@@ -2,7 +2,7 @@ package sh.arnaud.serializeformat.adapters;
 
 import com.google.gson.*;
 import sh.arnaud.serializeformat.next.stream.types.FieldTypeCode;
-import sh.arnaud.serializeformat.next.stream.types.objects.*;
+import sh.arnaud.serializeformat.next.stream.types.grammar.*;
 
 import java.lang.reflect.Type;
 

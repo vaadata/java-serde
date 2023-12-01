@@ -2,10 +2,10 @@ package sh.arnaud.serializeformat.serde;
 
 import com.google.gson.*;
 import sh.arnaud.serializeformat.adapters.*;
-import sh.arnaud.serializeformat.next.stream.types.GrammarBlockdata;
-import sh.arnaud.serializeformat.next.stream.types.GrammarContent;
-import sh.arnaud.serializeformat.next.stream.types.GrammarStream;
-import sh.arnaud.serializeformat.next.stream.types.objects.*;
+import sh.arnaud.serializeformat.next.stream.types.grammar.GrammarBlockdata;
+import sh.arnaud.serializeformat.next.stream.types.grammar.GrammarContent;
+import sh.arnaud.serializeformat.next.stream.types.grammar.GrammarStream;
+import sh.arnaud.serializeformat.next.stream.types.grammar.*;
 import sh.arnaud.serializeformat.next.stream.types.primitives.*;
 
 public class Json {

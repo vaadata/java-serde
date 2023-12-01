@@ -75,6 +75,9 @@ public abstract class Editor {
             editor.setContents(byteArray(json));
 
             // TODO: Toggleable for performance
+            // This is used to detect inconsistency between the original stream and what we re-encode, this issue can
+            // arise when different string definition are in the stream but with the same content (instead of using
+            // references).
             if (!Arrays.equals(Serialize.serialize(json).array(), json.getBytes())) {
                 logging.logToError("Inconsistency while loading stream");
             }
