@@ -1,7 +1,6 @@
-### Questions
+# Java serde
 
-* When defining a new class we can set the superclass as a reference to a previously defined class.
-  * Is it possible to make a cyclic dependency ? Leading to maybe DoS ?
+A Burp extension and CLI to encode and decode Java Object Stream into a JSON representation.
 
 ## See also
 
@@ -42,6 +41,7 @@ When everything is ready we can run the tests using Gradle.
 
 ## Known limitations
 
+* To use a reference, the object must be declared before in the stream.
 * `TC_PROXYCLASSDESC` Is not implemented and could require a lot of work.
 * `TC_RESET` Is not implemented but should be easy to do.
 * `TC_EXCEPTION` Is not implemented and requires `TC_RESET`.
@@ -51,7 +51,7 @@ When everything is ready we can run the tests using Gradle.
 
 ## Improvements
 
-* Object of known type (such as `Double`, `Integer`, `Date`, etc.) could be represented in a primitive form. The hard 
+* Object of known type (such as `Date`, etc.) could be represented in a primitive form. The hard 
   part may be with classes inheriting them.
 * Toggleable representation. If we decide to implement the custom representation for known types or string reference we
   should be able to toggle if it's a behavior we want or not.
