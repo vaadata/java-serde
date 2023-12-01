@@ -1,7 +1,7 @@
 package sh.arnaud.serializeformat.ser;
 
-import sh.arnaud.serializeformat.next.stream.types.grammar.GrammarStream;
-import sh.arnaud.serializeformat.serde.Json;
+import sh.arnaud.serializeformat.types.grammar.GrammarStream;
+import sh.arnaud.serializeformat.codec.Json;
 
 public class FromJson {
     public GrammarStream writeStreamFromJson(String s) {

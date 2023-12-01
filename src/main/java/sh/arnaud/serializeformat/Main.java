@@ -23,9 +23,7 @@ public class Main {
                 System.out.writeBytes(json.getBytes());
             }
 
-            default -> {
-                System.out.println("Invalid mode, see usage.");
-            }
+            default -> System.out.println("Invalid mode, see usage.");
         }
     }
 }

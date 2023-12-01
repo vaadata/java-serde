@@ -1,7 +1,7 @@
 package sh.arnaud.serializeformat.adapters;
 
 import com.google.gson.*;
-import sh.arnaud.serializeformat.next.stream.types.grammar.GrammarBlockdata;
+import sh.arnaud.serializeformat.types.grammar.GrammarBlockdata;
 
 import java.lang.reflect.Type;
 

@@ -4,8 +4,8 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import sh.arnaud.serializeformat.next.stream.types.grammar.*;
-import sh.arnaud.serializeformat.next.stream.types.primitives.PrimitiveJson;
+import sh.arnaud.serializeformat.types.grammar.*;
+import sh.arnaud.serializeformat.types.primitives.PrimitiveJson;
 
 import java.lang.reflect.Type;
 
@@ -25,8 +25,6 @@ public class GrammarObjectAdapter implements JsonDeserializer<GrammarObject> {
                 var handle = object.get("@ref").getAsInt();
                 return deserializationContext.find(handle);
             }
-
-
 
             if (object.has("@handle") && object.has("@class") && object.has("@data")) {
                 return context.deserialize(src, GrammarNewObject.class);
@@ -56,7 +54,6 @@ public class GrammarObjectAdapter implements JsonDeserializer<GrammarObject> {
             return new PrimitiveJson(primitive);
         }
 
-        System.out.println(src);
         throw new JsonParseException("Not implemented yet!");
     }
 }

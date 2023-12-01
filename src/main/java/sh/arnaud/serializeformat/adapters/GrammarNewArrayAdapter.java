@@ -2,7 +2,9 @@ package sh.arnaud.serializeformat.adapters;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
-import sh.arnaud.serializeformat.next.stream.types.grammar.*;
+import sh.arnaud.serializeformat.types.grammar.GrammarNewArray;
+import sh.arnaud.serializeformat.types.grammar.GrammarNewClassDesc;
+import sh.arnaud.serializeformat.types.grammar.GrammarObject;
 
 import java.lang.reflect.Type;
 import java.util.List;

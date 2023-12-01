@@ -4,9 +4,9 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import sh.arnaud.serializeformat.next.stream.types.grammar.GrammarBlockdata;
-import sh.arnaud.serializeformat.next.stream.types.grammar.GrammarContent;
-import sh.arnaud.serializeformat.next.stream.types.grammar.GrammarObject;
+import sh.arnaud.serializeformat.types.grammar.GrammarBlockdata;
+import sh.arnaud.serializeformat.types.grammar.GrammarContent;
+import sh.arnaud.serializeformat.types.grammar.GrammarObject;
 
 import java.lang.reflect.Type;
 

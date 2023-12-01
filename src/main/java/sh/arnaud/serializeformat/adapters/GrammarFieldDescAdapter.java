@@ -1,8 +1,9 @@
 package sh.arnaud.serializeformat.adapters;
 
 import com.google.gson.*;
-import sh.arnaud.serializeformat.next.stream.types.FieldTypeCode;
-import sh.arnaud.serializeformat.next.stream.types.grammar.*;
+import sh.arnaud.serializeformat.types.FieldTypeCode;
+import sh.arnaud.serializeformat.types.grammar.GrammarFieldDesc;
+import sh.arnaud.serializeformat.types.grammar.GrammarNewString;
 
 import java.lang.reflect.Type;
 

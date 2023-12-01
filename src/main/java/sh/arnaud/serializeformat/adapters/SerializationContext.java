@@ -1,14 +1,14 @@
 package sh.arnaud.serializeformat.adapters;
 
 import com.google.gson.JsonElement;
-import sh.arnaud.serializeformat.next.stream.types.grammar.GrammarObject;
+import sh.arnaud.serializeformat.types.grammar.GrammarObject;
 
 import java.io.ObjectStreamConstants;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import static sh.arnaud.serializeformat.serde.Json.makeRef;
+import static sh.arnaud.serializeformat.codec.Json.makeRef;
 
 public class SerializationContext {
     private final Map<GrammarObject, Integer> storage = new HashMap<>();

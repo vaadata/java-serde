@@ -1,7 +1,7 @@
 package sh.arnaud.serializeformat.adapters;
 
 import com.google.gson.JsonParseException;
-import sh.arnaud.serializeformat.next.stream.types.grammar.GrammarObject;
+import sh.arnaud.serializeformat.types.grammar.GrammarObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,10 +28,7 @@ public class DeserializationContext {
                 .filter(set -> set.getValue() == handle)
                 .map(Map.Entry::getKey)
                 .findFirst()
-                .orElseThrow(() -> {
-                    System.out.println(handle);
-                    return new JsonParseException("Reference to a not yet declared object");
-                });
+                .orElseThrow(() -> new JsonParseException("Reference to a not yet declared object"));
     }
 
     /**
