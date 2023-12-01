@@ -7,8 +7,6 @@ import burp.api.montoya.http.message.requests.HttpRequest;
 import burp.api.montoya.ui.editor.extension.EditorCreationContext;
 import burp.api.montoya.ui.editor.extension.ExtensionProvidedHttpRequestEditor;
 
-import static burp.api.montoya.core.ByteArray.byteArray;
-
 public class RequestEditor extends Editor implements ExtensionProvidedHttpRequestEditor {
     RequestEditor(MontoyaApi api, EditorCreationContext context) {
         super(api, context);
