@@ -13,8 +13,8 @@ import burp.api.montoya.ui.editor.extension.EditorCreationContext;
 import burp.api.montoya.ui.editor.extension.EditorMode;
 import burp.api.montoya.utilities.CompressionType;
 import burp.api.montoya.utilities.CompressionUtils;
-import sh.arnaud.javaserde.de.Deserialize;
-import sh.arnaud.javaserde.ser.Serialize;
+import sh.arnaud.javaserde.codec.Decode;
+import sh.arnaud.javaserde.codec.Encode;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -47,7 +47,7 @@ public abstract class Editor {
         }
 
         try {
-            var stream = Serialize.serialize(content);
+            var stream = Encode.serialize(content);
             var streamBytes = byteArray(stream.array());
             var body = compressionUtils.compress(streamBytes, CompressionType.GZIP);
 
@@ -70,7 +70,7 @@ public abstract class Editor {
     private void load(HttpMessage message) {
         try {
             var binary = compressionUtils.decompress(message.body(), CompressionType.GZIP);
-            var json = Deserialize.deserialize(binary.getBytes());
+            var json = Decode.decode(binary.getBytes());
 
             editor.setContents(byteArray(json));
 
@@ -78,7 +78,7 @@ public abstract class Editor {
             // This is used to detect inconsistency between the original stream and what we re-encode, this issue can
             // arise when different string definition are in the stream but with the same content (instead of using
             // references).
-            if (!Arrays.equals(Serialize.serialize(json).array(), json.getBytes())) {
+            if (!Arrays.equals(Encode.serialize(json).array(), json.getBytes())) {
                 logging.logToError("Inconsistency while loading stream");
             }
         } catch (Exception throwable) {

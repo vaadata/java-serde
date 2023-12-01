@@ -1,7 +1,7 @@
 package sh.arnaud.javaserde;
 
-import sh.arnaud.javaserde.de.Deserialize;
-import sh.arnaud.javaserde.ser.Serialize;
+import sh.arnaud.javaserde.codec.Decode;
+import sh.arnaud.javaserde.codec.Encode;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -13,13 +13,13 @@ public class Main {
         switch (args[0]) {
             case "encode" -> {
                 byte[] stdin = System.in.readAllBytes();
-                var stream = Serialize.serialize(new String(stdin));
+                var stream = Encode.serialize(new String(stdin));
                 System.out.writeBytes(stream.array());
             }
 
             case "decode" -> {
                 byte[] stdin = System.in.readAllBytes();
-                var json = Deserialize.deserialize(stdin);
+                var json = Decode.decode(stdin);
                 System.out.writeBytes(json.getBytes());
             }
 

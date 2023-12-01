@@ -2,8 +2,8 @@ package sh.arnaud.javaserde;
 
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
-import sh.arnaud.javaserde.de.Deserialize;
-import sh.arnaud.javaserde.ser.Serialize;
+import sh.arnaud.javaserde.codec.Decode;
+import sh.arnaud.javaserde.codec.Encode;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -42,11 +42,11 @@ class JavaSerdeTest {
             var bin = readFile(binFile);
             var binReverse = binReverseFile.isFile() ? readFile(binReverseFile) : bin;
 
-            var outputJson = Deserialize.deserialize(bin);
+            var outputJson = Decode.decode(bin);
 
             assertEquals(new String(json), outputJson);
 
-            var outputBin = Serialize.serialize(outputJson);
+            var outputBin = Encode.serialize(outputJson);
 
             assertEquals(bytesToHex(binReverse), bytesToHex(outputBin.array()));
 
