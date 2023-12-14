@@ -36,6 +36,6 @@ jar {
     }
 
     manifest {
-        attributes 'Main-Class': 'sh.arnaud.serializeformat.Main'
+        attributes 'Main-Class': 'sh.arnaud.javaserde.Main'
     }
 }
