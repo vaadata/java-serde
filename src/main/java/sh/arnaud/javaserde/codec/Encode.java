@@ -1,6 +1,5 @@
 package sh.arnaud.javaserde.codec;
 
-import sh.arnaud.javaserde.ser.FromJson;
 import sh.arnaud.javaserde.types.grammar.GrammarStream;
 
 import java.nio.ByteBuffer;
