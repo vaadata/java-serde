@@ -64,7 +64,7 @@ public class Encoder {
             return;
         }
 
-        throw new UnsupportedOperationException("Serialization of content not implemented yet!");
+        throw new UnsupportedOperationException("Serialization of content not implemented yet: ".concat(content.getClass().getName()));
     }
 
     private void referenceable(GrammarObject object, Callable<Void> runnable) throws Exception {
@@ -105,6 +105,11 @@ public class Encoder {
 
     private void writeNewArray(GrammarNewArray array) throws Exception {
         referenceable(array, () -> {
+            if (array == null) {
+                buffer.writeByte(TC_NULL);
+                return null;
+            }
+
             buffer.writeByte(TC_ARRAY);
             writeClassDesc(array.classDesc);
 

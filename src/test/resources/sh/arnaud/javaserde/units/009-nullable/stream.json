@@ -1,0 +1,37 @@
+[
+  {
+    "@handle": 8257540,
+    "@class": {
+      "@handle": 8257536,
+      "@name": "Nullable",
+      "@serial": 9613321951376902,
+      "@flags": 2,
+      "@fields": [
+        {
+          "@name": "null_enum",
+          "@type": "LNullable$Enum;"
+        },
+        {
+          "@name": "null_ints",
+          "@type": "[I"
+        },
+        {
+          "@name": "null_string",
+          "@type": "Ljava/lang/String;"
+        }
+      ],
+      "@annotations": [],
+      "@super": null
+    },
+    "@data": [
+      {
+        "@values": [
+          null,
+          null,
+          null
+        ],
+        "@annotations": []
+      }
+    ]
+  }
+]

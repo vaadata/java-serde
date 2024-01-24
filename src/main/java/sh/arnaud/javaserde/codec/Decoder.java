@@ -116,7 +116,15 @@ public class Decoder {
     }
 
     private GrammarNewArray readNewArray(ByteBuffer data) throws Exception {
-        if (peekByte(data) == TC_REFERENCE) {
+        var peeked = peekByte(data);
+
+        if (peeked == TC_NULL) {
+            data.get();
+
+            return null;
+        }
+
+        if (peeked == TC_REFERENCE) {
             data.get();
 
             return handles.retrieve(data.getInt(), GrammarNewArray.class);
