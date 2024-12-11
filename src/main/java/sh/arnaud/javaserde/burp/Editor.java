@@ -26,6 +26,7 @@ public abstract class Editor {
     private final CompressionUtils compressionUtils;
     private final RawEditor editor;
     protected HttpRequestResponse requestResponse;
+    private boolean isGzipped = false;
 
     Editor(MontoyaApi api, EditorCreationContext context) {
         logging = api.logging();
@@ -48,8 +49,11 @@ public abstract class Editor {
 
         try {
             var stream = Encode.serialize(content);
-            var streamBytes = byteArray(stream.array());
-            var body = compressionUtils.compress(streamBytes, CompressionType.GZIP);
+            var body = byteArray(stream.array());
+
+            if (isGzipped) {
+                body = compressionUtils.compress(body, CompressionType.GZIP);
+            }
 
             // TODO: This can be removed if Burp implements these methods on HttpMessage.
             if (message instanceof HttpRequest request) {
@@ -67,10 +71,31 @@ public abstract class Editor {
 
     protected abstract HttpMessage getMessage(HttpRequestResponse requestResponse);
 
+    private boolean bytesStartsWith(byte[] src, byte[] prefix) {
+        if (prefix.length > src.length) {
+            return false;
+        }
+
+        for (int i = 0; i < prefix.length; i++) {
+            if (src[i] != prefix[i]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private void load(HttpMessage message) {
         try {
-            var binary = compressionUtils.decompress(message.body(), CompressionType.GZIP);
-            var json = Decode.decode(binary.getBytes());
+            var body = message.body();
+
+            // Detect if the body is compressed using GZIP.
+            if (bytesStartsWith(body.getBytes(), new byte[]{ 0x1f, (byte) 0x8b, 0x08, 0x00 })) {
+                isGzipped = true;
+                body = compressionUtils.decompress(message.body(), CompressionType.GZIP);
+            }
+
+            var json = Decode.decode(body.getBytes());
 
             editor.setContents(byteArray(json));
 
